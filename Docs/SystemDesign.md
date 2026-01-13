@@ -290,21 +290,34 @@ window.electronAPI = {
 ### 3.1 Основные таблицы
 
 ```sql
+-- Мир/Город (сеттинг проекта)
+CREATE TABLE worlds (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    timezone TEXT NOT NULL DEFAULT 'UTC',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
 -- Фракции
 CREATE TABLE factions (
     id TEXT PRIMARY KEY,
+    world_id TEXT NOT NULL,
     name TEXT NOT NULL,
     color TEXT NOT NULL, -- hex #RRGGBB
     opacity REAL NOT NULL DEFAULT 0.4,
     notes_public TEXT,
     notes_gm TEXT,
     created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (world_id) REFERENCES worlds(id) ON DELETE CASCADE
 );
 
--- Персонажи
+-- Персонажи (NPC и PC)
 CREATE TABLE people (
     id TEXT PRIMARY KEY,
+    world_id TEXT NOT NULL,
     name TEXT NOT NULL,
     aliases TEXT, -- JSON array
     status TEXT DEFAULT 'alive', -- alive|dead|unknown
@@ -315,8 +328,18 @@ CREATE TABLE people (
     notes_gm TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
+    FOREIGN KEY (world_id) REFERENCES worlds(id) ON DELETE CASCADE,
     FOREIGN KEY (workplace_place_id) REFERENCES places(id) ON DELETE SET NULL,
     FOREIGN KEY (home_place_id) REFERENCES places(id) ON DELETE SET NULL
+);
+
+-- Персонажи игроков (расширение Person)
+CREATE TABLE player_characters (
+    person_id TEXT PRIMARY KEY,
+    playbook TEXT, -- Cutter, Lurk, Slide, etc.
+    crew TEXT, -- название команды
+    is_active INTEGER NOT NULL DEFAULT 1, -- SQLite boolean
+    FOREIGN KEY (person_id) REFERENCES people(id) ON DELETE CASCADE
 );
 
 -- Принадлежность к фракциям (many-to-many)
@@ -333,37 +356,46 @@ CREATE TABLE faction_memberships (
 -- Места
 CREATE TABLE places (
     id TEXT PRIMARY KEY,
+    world_id TEXT NOT NULL,
     name TEXT NOT NULL,
     type TEXT NOT NULL, -- building|district|landmark|other
     position TEXT, -- JSON {x, y} или NULL
     owner_faction_id TEXT,
+    parent_place_id TEXT, -- для иерархии (район -> здание)
     notes_public TEXT,
     notes_gm TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
-    FOREIGN KEY (owner_faction_id) REFERENCES factions(id) ON DELETE SET NULL
+    FOREIGN KEY (world_id) REFERENCES worlds(id) ON DELETE CASCADE,
+    FOREIGN KEY (owner_faction_id) REFERENCES factions(id) ON DELETE SET NULL,
+    FOREIGN KEY (parent_place_id) REFERENCES places(id) ON DELETE SET NULL
 );
 
 -- Страницы заметок
 CREATE TABLE note_pages (
     id TEXT PRIMARY KEY,
-    title TEXT NOT NULL UNIQUE,
+    world_id TEXT NOT NULL,
+    title TEXT NOT NULL,
     body_markdown TEXT NOT NULL,
-    visibility TEXT NOT NULL DEFAULT 'public', -- public|gm
+    scope TEXT NOT NULL DEFAULT 'public', -- public|gm|player
     entity_type TEXT, -- faction|person|place
     entity_id TEXT,
     created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (world_id) REFERENCES worlds(id) ON DELETE CASCADE,
+    UNIQUE (world_id, title)
 );
 
 -- Связи (материализованные или вычисляемые из wikilinks)
 CREATE TABLE links (
     id TEXT PRIMARY KEY,
+    world_id TEXT NOT NULL,
     from_page_id TEXT NOT NULL,
     to_page_id TEXT NOT NULL,
     link_type TEXT NOT NULL, -- wikilink|manual|reference
-    visibility TEXT NOT NULL DEFAULT 'public',
+    scope TEXT NOT NULL DEFAULT 'public', -- public|gm|player
     meta TEXT, -- JSON для дополнительных данных
+    FOREIGN KEY (world_id) REFERENCES worlds(id) ON DELETE CASCADE,
     FOREIGN KEY (from_page_id) REFERENCES note_pages(id) ON DELETE CASCADE,
     FOREIGN KEY (to_page_id) REFERENCES note_pages(id) ON DELETE CASCADE,
     UNIQUE (from_page_id, to_page_id, link_type)
@@ -372,9 +404,11 @@ CREATE TABLE links (
 -- Снимки (таймлайн)
 CREATE TABLE snapshots (
     id TEXT PRIMARY KEY,
+    world_id TEXT NOT NULL,
     at_date TEXT NOT NULL, -- ISO8601
     label TEXT NOT NULL,
-    created_at TEXT NOT NULL
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (world_id) REFERENCES worlds(id) ON DELETE CASCADE
 );
 
 -- Карты (базовые изображения)
@@ -408,33 +442,103 @@ CREATE TABLE active_snapshot (
     FOREIGN KEY (snapshot_id) REFERENCES snapshots(id),
     CHECK (id = '1')
 );
+
+-- События (журнал/нарратив)
+CREATE TABLE events (
+    id TEXT PRIMARY KEY,
+    world_id TEXT NOT NULL,
+    at_datetime TEXT NOT NULL, -- ISO8601
+    title TEXT NOT NULL,
+    body_markdown TEXT,
+    scope TEXT NOT NULL DEFAULT 'gm', -- public|gm|player
+    snapshot_id TEXT, -- опциональная привязка к снимку
+    FOREIGN KEY (world_id) REFERENCES worlds(id) ON DELETE CASCADE,
+    FOREIGN KEY (snapshot_id) REFERENCES snapshots(id) ON DELETE SET NULL
+);
+
+-- Ссылки событий на сущности
+CREATE TABLE event_refs (
+    id TEXT PRIMARY KEY,
+    event_id TEXT NOT NULL,
+    entity_type TEXT NOT NULL, -- faction|person|place|page
+    entity_id TEXT NOT NULL,
+    role TEXT, -- involved|location|target|etc
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+);
+
+-- Метаданные проекта
+CREATE TABLE project_meta (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
 ```
 
 ### 3.2 Индексы (для производительности)
 
 ```sql
-CREATE INDEX idx_faction_memberships_person ON faction_memberships(person_id);
-CREATE INDEX idx_faction_memberships_faction ON faction_memberships(faction_id);
+-- Индексы для FK и частых запросов
+CREATE INDEX idx_factions_world ON factions(world_id);
+CREATE INDEX idx_people_world ON people(world_id);
+CREATE INDEX idx_places_world ON places(world_id);
+CREATE INDEX idx_places_parent ON places(parent_place_id);
+CREATE INDEX idx_note_pages_world ON note_pages(world_id);
+CREATE INDEX idx_note_pages_title ON note_pages(world_id, title);
+CREATE INDEX idx_links_world ON links(world_id);
 CREATE INDEX idx_links_from ON links(from_page_id);
 CREATE INDEX idx_links_to ON links(to_page_id);
+CREATE INDEX idx_snapshots_world_date ON snapshots(world_id, at_date);
+CREATE INDEX idx_events_world_datetime ON events(world_id, at_datetime);
+CREATE INDEX idx_event_refs_event ON event_refs(event_id);
+CREATE INDEX idx_event_refs_entity ON event_refs(entity_type, entity_id);
+CREATE INDEX idx_faction_memberships_person ON faction_memberships(person_id);
+CREATE INDEX idx_faction_memberships_faction ON faction_memberships(faction_id);
 CREATE INDEX idx_territory_tiles_lookup ON territory_tiles(snapshot_id, faction_id, z, x, y);
-CREATE INDEX idx_note_pages_title ON note_pages(title);
 ```
 
 ### 3.3 Версионирование проекта
 
-**Метаданные проекта:**
+**Метаданные проекта** (таблица `project_meta`, см. выше в секции 3.1):
 ```sql
-CREATE TABLE project_meta (
-    key TEXT PRIMARY KEY,
-    value TEXT NOT NULL
-);
-
 INSERT INTO project_meta (key, value) VALUES
     ('version', '1'),
     ('created_at', datetime('now')),
     ('app_version', '0.1.0');
 ```
+
+### 3.4 Тестовая база данных: "Little Doskvol"
+
+Для тестирования реализована seed-база "Little Doskvol" (маленький город):
+
+**Состав данных:**
+- **1 World**: "Little_Doskvol" с описанием и timezone UTC
+- **3 Snapshots**: Day1 (1920-01-01 08:00), Day2 (1920-01-02 08:00), Day3 (1920-01-03 08:00) + active_snapshot на Day3
+- **4 Factions**:
+  - Bluecoats (городская стража, цвет #0066CC)
+  - The_Crows (банда, контроль Crow's Foot, #333333)
+  - Lampblacks (промышленная банда, #FF6600)
+  - City_Council (теневое правительство, gm-only, #9900CC)
+- **5 Places**:
+  - Districts: Crows_Foot, Warehouse_District
+  - Buildings: The_Leaky_Bucket (таверна), Bluecoat_Precinct_7
+  - Landmark: Old_Bridge
+- **7 People**:
+  - NPCs: Lyssa (шпион/контрабандист), Roric (мертвый босс Crows), Captain Vale (капитан Bluecoats), Marlane (подпольный доктор)
+  - PCs: Cutter Kane, Ghost Whisper, Silver Tongue Sara (все в crew "The_Shadow_Crew")
+- **3 Player Characters**: привязаны к 3 PC people, с playbook (Cutter/Lurk/Slide)
+- **6 Faction Memberships**: связывают людей с фракциями (роли: boss, smuggler, captain, enforcer, thief, diplomat)
+- **7 Note Pages**: mix of public/gm/player scope с wikilinks
+- **5 Territory Tiles**: минимальные 1x1 PNG для тестирования API tiles (по разным snapshot)
+- **5 Events** (scope mix) с **16 EventRefs**:
+  - "Brawl at The Leaky Bucket" (Day1)
+  - "Boss Roric Found Dead" (Day2)
+  - "Bluecoats Raid Warehouse" (Day2)
+  - "Secret Council Meeting" (Day3, gm-only)
+  - "Player Crew Heist" (Day3, player scope)
+
+**Использование в тестах:**
+- Fixture `seed_small_town` в `backend/tests/conftest.py`
+- Детерминированные UUIDs через `uuid.uuid5` для стабильности
+- Возвращает dict с ID всех созданных сущностей для удобства assertions
 
 ## 4. Формат данных
 

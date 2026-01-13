@@ -6,11 +6,20 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.db import get_session
-from app.models import Person
+from app.models import Person, World
 from app.schemas import PersonCreate, PersonResponse, PersonUpdate
+
+
+def get_default_world_id(session: Session) -> str:
+    """Get the default world ID (first world in DB)."""
+    world = session.execute(select(World)).scalars().first()
+    if not world:
+        raise HTTPException(status_code=500, detail="No world found in database")
+    return world.id
 
 router = APIRouter(prefix="/people", tags=["people"])
 
@@ -20,7 +29,7 @@ async def list_people(
     session: Annotated[Session, Depends(get_session)],
 ) -> list[dict[str, str | list[str] | datetime | None]]:
     """List all people."""
-    people = session.exec(select(Person)).all()
+    people = session.execute(select(Person)).scalars().all()
     # Convert JSON strings to lists for response
     return [
         {
@@ -38,8 +47,10 @@ async def create_person(
     session: Annotated[Session, Depends(get_session)],
 ) -> dict[str, str | list[str] | datetime | None]:
     """Create a new person."""
+    world_id = get_default_world_id(session)
     person = Person(
         id=str(uuid.uuid4()),
+        world_id=world_id,
         name=person_data.name,
         aliases=json.dumps(person_data.aliases) if person_data.aliases else None,
         status=person_data.status,

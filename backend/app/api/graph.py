@@ -4,7 +4,8 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel
-from sqlmodel import Session, select
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.db import get_session
 from app.models import Link, NotePage
@@ -58,15 +59,15 @@ async def get_graph(
     # Get pages (nodes)
     pages_query = select(NotePage)
     if view_mode == "player":
-        pages_query = pages_query.where(NotePage.visibility == "public")
-    pages = session.exec(pages_query).all()
+        pages_query = pages_query.where(NotePage.scope == "public")
+    pages = session.execute(pages_query).scalars().all()
 
     nodes = [
         GraphNode(
             id=page.id,
             type="page",
             title=page.title,
-            visibility=page.visibility,
+            visibility=page.scope,  # Map scope to visibility for API compat
         )
         for page in pages
     ]
@@ -74,8 +75,8 @@ async def get_graph(
     # Get links (edges)
     links_query = select(Link)
     if view_mode == "player":
-        links_query = links_query.where(Link.visibility == "public")
-    links = session.exec(links_query).all()
+        links_query = links_query.where(Link.scope == "public")
+    links = session.execute(links_query).scalars().all()
 
     # Filter edges to only include links between visible nodes
     visible_node_ids = {node.id for node in nodes}
@@ -84,7 +85,7 @@ async def get_graph(
             from_id=link.from_page_id,
             to_id=link.to_page_id,
             link_type=link.link_type,
-            visibility=link.visibility,
+            visibility=link.scope,  # Map scope to visibility for API compat
         )
         for link in links
         if link.from_page_id in visible_node_ids and link.to_page_id in visible_node_ids
@@ -118,4 +119,4 @@ async def get_page_backlinks(
     view_mode: Literal["gm", "player"] = "player" if x_view_mode == "player" else "gm"
     backlink_pages = get_backlinks(session, page_id, view_mode)
 
-    return [{"id": p.id, "title": p.title, "visibility": p.visibility} for p in backlink_pages]
+    return [{"id": p.id, "title": p.title, "visibility": p.scope} for p in backlink_pages]

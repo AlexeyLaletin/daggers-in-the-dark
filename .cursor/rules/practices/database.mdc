@@ -1,0 +1,474 @@
+---
+description: SQLAlchemy ORM patterns, migration workflow, test fixtures, and database development best practices
+globs: ["**/models.py", "**/db.py", "**/conftest.py", "**/migrations/**", "**/alembic/**"]
+alwaysApply: false
+---
+
+# Database Development Best Practices
+
+**Purpose:** Guidelines for working with SQLAlchemy ORM, database schema, migrations, and test fixtures.
+
+**When to use:** When developing database models, writing migrations, or creating test fixtures.
+
+**Related:**
+- System design: `Docs/SystemDesign.md` (section 3: Модель данных)
+- Technical specification: `Docs/TZ.md` (section 5: Данные и сущности)
+- Testing practices: `.cursor/rules/practices/tdd.mdc`
+- Python tools: `.cursor/rules/setup/python_tools.mdc`
+
+## Overview
+
+This project uses **SQLAlchemy 2.0+ ORM** with declarative models for database access. All entities are linked to a `world_id` FK (single-world-per-project architecture).
+
+## SQLAlchemy ORM Patterns
+
+### Model Definition
+
+Use **DeclarativeBase** with **Mapped[]** type annotations:
+
+```python
+from sqlalchemy import ForeignKey, Text
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+
+class Base(DeclarativeBase):
+    """Base class for all models."""
+    pass
+
+
+class MyModel(Base):
+    """Example model."""
+    __tablename__ = "my_models"
+
+    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    world_id: Mapped[str] = mapped_column(ForeignKey("worlds.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(Text, nullable=False, index=True)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
+
+    # Relationships
+    world: Mapped["World"] = relationship(back_populates="my_models")
+```
+
+**Key patterns:**
+- Use `Mapped[type]` for all columns
+- Use `mapped_column()` for column definition
+- Always add `__tablename__` explicitly
+- Use `relationship()` with `back_populates` for bidirectional relationships
+
+### Primary Keys
+
+Use **TEXT (UUID strings)** for primary keys:
+
+```python
+import uuid
+
+id: Mapped[str] = mapped_column(Text, primary_key=True)
+
+# When creating:
+my_model = MyModel(
+    id=str(uuid.uuid4()),
+    world_id=world_id,
+    # ...
+)
+```
+
+### Foreign Keys and Relationships
+
+**Foreign key columns:**
+```python
+world_id: Mapped[str] = mapped_column(
+    ForeignKey("worlds.id", ondelete="CASCADE"),
+    nullable=False,
+    index=True
+)
+```
+
+**Relationships:**
+```python
+# One-to-many (parent side)
+children: Mapped[list["Child"]] = relationship(
+    back_populates="parent",
+    cascade="all, delete-orphan"
+)
+
+# One-to-many (child side)
+parent: Mapped["Parent"] = relationship(back_populates="children")
+
+# Many-to-many (via association table)
+memberships: Mapped[list["Membership"]] = relationship(
+    back_populates="person",
+    cascade="all, delete-orphan"
+)
+```
+
+**Cascade rules:**
+- `all, delete-orphan`: For owned children (delete when parent deleted or orphaned)
+- `ondelete="CASCADE"`: For FK constraint (DB-level cascade)
+- `ondelete="SET NULL"`: For optional references
+
+### JSON Fields
+
+Store as TEXT, serialize manually:
+
+```python
+import json
+
+# Column definition
+aliases: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON array as string
+
+# When creating
+person = Person(
+    aliases=json.dumps(["alias1", "alias2"]) if data.aliases else None,
+    # ...
+)
+
+# When reading (in API response)
+return {
+    "aliases": json.loads(person.aliases) if person.aliases else [],
+    # ...
+}
+```
+
+### Self-Referencing Relationships
+
+For hierarchical data (e.g., place → parent_place):
+
+```python
+parent_place_id: Mapped[Optional[str]] = mapped_column(
+    ForeignKey("places.id", ondelete="SET NULL"),
+    nullable=True,
+    index=True
+)
+
+parent: Mapped[Optional["Place"]] = relationship(
+    remote_side="Place.id",
+    back_populates="children"
+)
+children: Mapped[list["Place"]] = relationship(back_populates="parent")
+```
+
+## Queries with SQLAlchemy 2.0
+
+### Basic Queries
+
+```python
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+# Get all
+factions = session.execute(select(Faction)).scalars().all()
+
+# Get one
+faction = session.execute(select(Faction).where(Faction.id == faction_id)).scalars().first()
+
+# Or using session.get() for PK lookup
+faction = session.get(Faction, faction_id)
+
+# Filtering
+public_pages = session.execute(
+    select(NotePage).where(NotePage.scope == "public")
+).scalars().all()
+
+# Ordering
+snapshots = session.execute(
+    select(Snapshot).order_by(Snapshot.at_date)
+).scalars().all()
+```
+
+### Joins
+
+```python
+# Explicit join
+pages = session.execute(
+    select(NotePage)
+    .join(Link, Link.from_page_id == NotePage.id)
+    .where(Link.to_page_id == target_id)
+).scalars().all()
+```
+
+## Adding New Models
+
+**Step-by-step workflow:**
+
+1. **Define model** in `backend/app/models.py`:
+   - Add class inheriting from Base
+   - Add all columns with Mapped[] types
+   - Add world_id FK (if entity is world-scoped)
+   - Add relationships with back_populates
+   - Add created_at/updated_at timestamps
+
+2. **Update db.py** if needed:
+   - Import new model in Base imports (for metadata.create_all)
+
+3. **Create API endpoint** (if needed):
+   - Add get_default_world_id helper or import from shared utils
+   - Auto-populate world_id in create operations
+
+4. **Update test fixtures**:
+   - Add entities to seed_small_town in conftest.py
+   - Return IDs in fixture dict for test assertions
+
+5. **Update schemas** (if API):
+   - Add Pydantic schemas (Create, Update, Response)
+
+6. **Update documentation**:
+   - Add table to Docs/SystemDesign.md section 3.1
+   - Add indexes to section 3.2
+   - Document in Docs/TZ.md section 5
+
+## World ID Pattern
+
+**Rule**: All world-scoped entities must have `world_id` FK.
+
+**API auto-population** (in entity creation endpoints):
+```python
+def get_default_world_id(session: Session) -> str:
+    """Get the default world ID (first world in DB)."""
+    world = session.execute(select(World)).scalars().first()
+    if not world:
+        raise HTTPException(status_code=500, detail="No world found in database")
+    return world.id
+
+# Use in create endpoint:
+world_id = get_default_world_id(session)
+entity = MyEntity(
+    id=str(uuid.uuid4()),
+    world_id=world_id,
+    # ...
+)
+```
+
+**Rationale**: Single-world-per-project architecture. Clients don't send world_id; APIs auto-populate from DB context.
+
+## Transactions
+
+**Default**: Session auto-commits on `session.commit()`.
+
+**Pattern for operations**:
+```python
+# Multiple operations in one transaction
+entity1 = Entity1(...)
+entity2 = Entity2(...)
+
+session.add(entity1)
+session.add(entity2)
+session.commit()  # Commits both
+
+# Refresh to get DB-generated values
+session.refresh(entity1)
+```
+
+**Rollback on error** (handled by FastAPI dependency):
+```python
+def get_session() -> Generator[Session, None, None]:
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()  # Auto-rollback on exception
+```
+
+## Test Fixtures
+
+### Using Fixtures
+
+**Import in test files:**
+```python
+def test_my_feature(db_session: Session, seed_small_town: dict) -> None:
+    """Test with seeded database."""
+    # Access seeded data IDs
+    faction_id = seed_small_town["faction_ids"]["crows"]
+
+    # Query database
+    faction = db_session.get(Faction, faction_id)
+    assert faction.name == "The_Crows"
+```
+
+**Available fixtures:**
+- `temp_db_engine`: Temporary SQLite engine (function scope)
+- `db_session`: Clean session for test (function scope)
+- `client`: FastAPI TestClient with overridden session (function scope)
+- `ensure_world_exists`: Auto-creates default World (autouse, function scope)
+- `seed_small_town`: Full "Little Doskvol" seed data (function scope)
+
+### Seed Database Structure
+
+The `seed_small_town` fixture creates a comprehensive test world:
+
+**Returns dict with:**
+```python
+{
+    "world_id": str,
+    "snapshot_ids": {"day1": str, "day2": str, "day3": str},
+    "faction_ids": {"bluecoats": str, "crows": str, ...},
+    "place_ids": {"crows_foot": str, "leaky_bucket": str, ...},
+    "person_ids": {"lyssa": str, "roric": str, ...},
+    "pc_ids": [str, str, str],  # Player character IDs
+    "page_ids": {...},
+    "event_ids": {...},
+}
+```
+
+**Use for assertions:**
+```python
+def test_faction_territory(seed_small_town: dict, db_session: Session) -> None:
+    crows_id = seed_small_town["faction_ids"]["crows"]
+    tiles = db_session.execute(
+        select(TerritoryTile).where(TerritoryTile.faction_id == crows_id)
+    ).scalars().all()
+    assert len(tiles) > 0
+```
+
+### Deterministic UUIDs
+
+Test fixtures use `uuid.uuid5` for reproducible IDs:
+
+```python
+TEST_NAMESPACE = uuid.UUID("00000000-0000-0000-0000-000000000000")
+
+def make_uuid(name: str) -> str:
+    return str(uuid.uuid5(TEST_NAMESPACE, name))
+
+# Usage
+faction_id = make_uuid("faction_crows")
+```
+
+## Database Initialization
+
+**Schema creation:**
+```python
+from app.db import init_db
+
+# Creates all tables from Base.metadata
+init_db()
+```
+
+**In production:**
+- `init_db()` called on app startup (see `app/main.py` lifespan)
+- Safe to call multiple times (SQLAlchemy checks existing tables)
+
+## Scope Field (Visibility)
+
+**Scope values**: `public` | `gm` | `player`
+
+**Applies to:**
+- NotePage.scope
+- Link.scope
+- Event.scope
+
+**Filtering in queries:**
+```python
+# GM mode: show all
+pages = session.execute(select(NotePage)).scalars().all()
+
+# Player mode: filter gm-only
+pages = session.execute(
+    select(NotePage).where(NotePage.scope.in_(["public", "player"]))
+).scalars().all()
+```
+
+## Common Patterns
+
+### Create Entity
+```python
+import uuid
+from datetime import datetime
+
+entity = MyEntity(
+    id=str(uuid.uuid4()),
+    world_id=get_default_world_id(session),
+    name=data.name,
+    created_at=datetime.utcnow(),
+    updated_at=datetime.utcnow(),
+)
+session.add(entity)
+session.commit()
+session.refresh(entity)
+return entity
+```
+
+### Update Entity
+```python
+entity = session.get(MyEntity, entity_id)
+if not entity:
+    raise HTTPException(status_code=404)
+
+entity.name = new_name
+entity.updated_at = datetime.utcnow()
+session.add(entity)
+session.commit()
+session.refresh(entity)
+```
+
+### Delete Entity
+```python
+entity = session.get(MyEntity, entity_id)
+if not entity:
+    raise HTTPException(status_code=404)
+
+session.delete(entity)
+session.commit()
+```
+
+## Migrations (Future)
+
+**When schema changes:**
+1. Use Alembic for migrations (to be set up)
+2. For now: Drop and recreate DB in development
+3. In tests: Each test gets fresh DB from `temp_db_engine`
+
+**Planned migration workflow:**
+```bash
+# Generate migration
+alembic revision --autogenerate -m "Add new_field to MyModel"
+
+# Apply migration
+alembic upgrade head
+
+# Rollback
+alembic downgrade -1
+```
+
+## Anti-Patterns to Avoid
+
+❌ **Don't** use SQLModel-style `.exec()`:
+```python
+# Bad
+results = session.exec(select(MyModel)).all()
+```
+
+✅ **Do** use SQLAlchemy 2.0 style:
+```python
+# Good
+results = session.execute(select(MyModel)).scalars().all()
+```
+
+❌ **Don't** forget world_id in world-scoped entities
+❌ **Don't** use `visibility` field (use `scope` instead)
+❌ **Don't** commit inside tight loops (batch commits)
+❌ **Don't** forget indexes on FK columns
+❌ **Don't** expose world_id in API request bodies (auto-populate in backend)
+
+## Checklist: Adding New Entity
+
+- [ ] Define model in models.py with Mapped[] types
+- [ ] Add world_id FK (if world-scoped)
+- [ ] Add relationships with back_populates
+- [ ] Add timestamps (created_at, updated_at)
+- [ ] Create API endpoints with get_default_world_id helper
+- [ ] Add Pydantic schemas
+- [ ] Add to seed_small_town fixture
+- [ ] Add CREATE TABLE to Docs/SystemDesign.md
+- [ ] Add indexes for FKs to Docs/SystemDesign.md
+- [ ] Document in Docs/TZ.md
+- [ ] Write tests using seed_small_town fixture
+
+## References
+
+- **SQLAlchemy 2.0 docs**: https://docs.sqlalchemy.org/en/20/
+- **Models**: `backend/app/models.py`
+- **DB init**: `backend/app/db.py`
+- **Test fixtures**: `backend/tests/conftest.py`
+- **Schema docs**: `Docs/SystemDesign.md` section 3
+- **TZ entities**: `Docs/TZ.md` section 5

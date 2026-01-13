@@ -6,10 +6,19 @@ from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlmodel import Session, select
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.db import get_session
-from app.models import ActiveSnapshot, Snapshot
+from app.models import ActiveSnapshot, Snapshot, World
+
+
+def get_default_world_id(session: Session) -> str:
+    """Get the default world ID (first world in DB)."""
+    world = session.execute(select(World)).scalars().first()
+    if not world:
+        raise HTTPException(status_code=500, detail="No world found in database")
+    return world.id
 
 router = APIRouter(prefix="/snapshots", tags=["snapshots"])
 
@@ -48,10 +57,10 @@ async def list_snapshots(
     session: Annotated[Session, Depends(get_session)],
 ) -> SnapshotsListResponse:
     """List all snapshots."""
-    snapshots = session.exec(select(Snapshot).order_by(Snapshot.at_date)).all()
+    snapshots = session.execute(select(Snapshot).order_by(Snapshot.at_date)).scalars().all()
 
     # Get active snapshot
-    active = session.exec(select(ActiveSnapshot)).first()
+    active = session.execute(select(ActiveSnapshot)).scalars().first()
     active_id = active.snapshot_id if active else None
 
     return SnapshotsListResponse(
@@ -66,15 +75,17 @@ async def create_snapshot(
     session: Annotated[Session, Depends(get_session)],
 ) -> Snapshot:
     """Create a new snapshot."""
+    world_id = get_default_world_id(session)
     snapshot = Snapshot(
         id=str(uuid.uuid4()),
+        world_id=world_id,
         at_date=snapshot_data.at_date,
         label=snapshot_data.label,
     )
     session.add(snapshot)
 
     # If this is the first snapshot, make it active
-    active = session.exec(select(ActiveSnapshot)).first()
+    active = session.execute(select(ActiveSnapshot)).scalars().first()
     if not active:
         active = ActiveSnapshot(id="1", snapshot_id=snapshot.id)
         session.add(active)
@@ -112,7 +123,7 @@ async def set_active_snapshot(
         raise HTTPException(status_code=404, detail="Snapshot not found")
 
     # Update or create active snapshot record
-    active = session.exec(select(ActiveSnapshot)).first()
+    active = session.execute(select(ActiveSnapshot)).scalars().first()
     if active:
         active.snapshot_id = snapshot_id
     else:
@@ -135,12 +146,12 @@ async def delete_snapshot(
         raise HTTPException(status_code=404, detail="Snapshot not found")
 
     # Check if it's the active snapshot
-    active = session.exec(select(ActiveSnapshot)).first()
+    active = session.execute(select(ActiveSnapshot)).scalars().first()
     if active and active.snapshot_id == snapshot_id:
         # Cannot delete active snapshot, or switch to another one first
-        remaining = session.exec(
+        remaining = session.execute(
             select(Snapshot).where(Snapshot.id != snapshot_id)
-        ).first()
+        ).scalars().first()
         if remaining:
             # Switch to another snapshot
             active.snapshot_id = remaining.id

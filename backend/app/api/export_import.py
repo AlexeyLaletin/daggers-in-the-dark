@@ -6,7 +6,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from app.db import DATABASE_PATH, engine, get_session, init_db
 

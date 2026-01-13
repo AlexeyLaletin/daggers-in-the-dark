@@ -6,11 +6,20 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.db import get_session
-from app.models import Place
+from app.models import Place, World
 from app.schemas import PlaceCreate, PlaceResponse, PlaceUpdate
+
+
+def get_default_world_id(session: Session) -> str:
+    """Get the default world ID (first world in DB)."""
+    world = session.execute(select(World)).scalars().first()
+    if not world:
+        raise HTTPException(status_code=500, detail="No world found in database")
+    return world.id
 
 router = APIRouter(prefix="/places", tags=["places"])
 
@@ -20,7 +29,7 @@ async def list_places(
     session: Annotated[Session, Depends(get_session)],
 ) -> list[dict[str, str | dict[str, float] | datetime | None]]:
     """List all places."""
-    places = session.exec(select(Place)).all()
+    places = session.execute(select(Place)).scalars().all()
     # Convert JSON strings to dicts for response
     return [
         {
@@ -37,8 +46,10 @@ async def create_place(
     session: Annotated[Session, Depends(get_session)],
 ) -> dict[str, str | dict[str, float] | datetime | None]:
     """Create a new place."""
+    world_id = get_default_world_id(session)
     place = Place(
         id=str(uuid.uuid4()),
+        world_id=world_id,
         name=place_data.name,
         type=place_data.type,
         position=json.dumps(place_data.position) if place_data.position else None,

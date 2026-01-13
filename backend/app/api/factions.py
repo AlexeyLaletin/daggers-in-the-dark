@@ -5,11 +5,20 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.db import get_session
-from app.models import Faction
+from app.models import Faction, World
 from app.schemas import FactionCreate, FactionResponse, FactionUpdate
+
+
+def get_default_world_id(session: Session) -> str:
+    """Get the default world ID (first world in DB)."""
+    world = session.execute(select(World)).scalars().first()
+    if not world:
+        raise HTTPException(status_code=500, detail="No world found in database")
+    return world.id
 
 router = APIRouter(prefix="/factions", tags=["factions"])
 
@@ -19,7 +28,7 @@ async def list_factions(
     session: Annotated[Session, Depends(get_session)],
 ) -> list[Faction]:
     """List all factions."""
-    factions = session.exec(select(Faction)).all()
+    factions = session.execute(select(Faction)).scalars().all()
     return list(factions)
 
 
@@ -29,8 +38,10 @@ async def create_faction(
     session: Annotated[Session, Depends(get_session)],
 ) -> Faction:
     """Create a new faction."""
+    world_id = get_default_world_id(session)
     faction = Faction(
         id=str(uuid.uuid4()),
+        world_id=world_id,
         name=faction_data.name,
         color=faction_data.color,
         opacity=faction_data.opacity,

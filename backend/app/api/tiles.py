@@ -6,7 +6,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel
-from sqlmodel import Session, and_, select
+from sqlalchemy import and_, select
+from sqlalchemy.orm import Session
 
 from app.db import get_session
 from app.models import Faction, Snapshot, TerritoryTile
@@ -55,7 +56,7 @@ async def get_tile(
         raise HTTPException(status_code=404, detail="Faction not found")
 
     # Get tile
-    tile = session.exec(
+    tile = session.execute(
         select(TerritoryTile).where(
             and_(
                 TerritoryTile.snapshot_id == snapshot_id,
@@ -65,7 +66,7 @@ async def get_tile(
                 TerritoryTile.y == y,
             )
         )
-    ).first()
+    ).scalars().first()
 
     if not tile:
         # Return 404 for missing tiles (frontend will treat as empty)
@@ -108,7 +109,7 @@ async def upload_tiles_batch(
             )
 
         # Check if tile already exists (upsert logic)
-        existing = session.exec(
+        existing = session.execute(
             select(TerritoryTile).where(
                 and_(
                     TerritoryTile.snapshot_id == snapshot_id,
@@ -118,7 +119,7 @@ async def upload_tiles_batch(
                     TerritoryTile.y == tile_item.y,
                 )
             )
-        ).first()
+        ).scalars().first()
 
         if existing:
             # Update existing tile
@@ -162,14 +163,14 @@ async def delete_tiles(
         raise HTTPException(status_code=404, detail="Snapshot not found")
 
     # Delete all tiles
-    tiles = session.exec(
+    tiles = session.execute(
         select(TerritoryTile).where(
             and_(
                 TerritoryTile.snapshot_id == snapshot_id,
                 TerritoryTile.faction_id == faction_id,
             )
         )
-    ).all()
+    ).scalars().all()
 
     deleted_count = len(tiles)
     for tile in tiles:
