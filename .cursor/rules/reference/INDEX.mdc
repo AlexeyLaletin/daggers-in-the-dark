@@ -68,6 +68,7 @@ alwaysApply: false
 - `frontend_best_practices.mdc` - Frontend best practices (TS/JS, UI architecture, perf, a11y, testing)
 - `tdd.mdc` - Test-driven development
 - `llm_filtering.mdc` - LLM code problem filtering
+- `shrimp_task_manager.mdc` - Shrimp Task Manager (MCP) workflow (always applied)
 
 ### Setup (`.cursor/rules/setup/`)
 - `python_tools.mdc` - Ruff, Mypy, pre-commit setup

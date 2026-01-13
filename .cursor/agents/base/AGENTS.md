@@ -10,6 +10,12 @@
 - Prefer small, reviewable changes over large rewrites.
 - Avoid over-engineering; solve the problem at hand.
 
+## Task Management (Shrimp)
+
+- **MUST**: Use Shrimp Task Manager (MCP) to plan and track multi-step work (2+ steps).
+- **MUST**: Keep task statuses updated while implementing; do not finish with open tasks.
+- See `.cursor/rules/practices/shrimp_task_manager.mdc`.
+
 ## Version Control (Git)
 
 - Prefer a clean, linear history when the repo/team expects it (often via rebase).

@@ -1,0 +1,25 @@
+---
+description: Use Shrimp Task Manager (MCP) for structured task planning and tracking
+alwaysApply: true
+---
+
+# Shrimp Task Manager (MCP)
+
+**Purpose:** Keep multi-step work structured and auditable: break requests into tasks, track progress, and close the loop.
+
+**Applies:** Always.
+
+## Required workflow
+
+- **When a user request is non-trivial (2+ steps)**: create/update a Shrimp task plan before implementing.
+- **During implementation**: keep task statuses updated (in progress / done) as you work.
+- **Before finishing**: ensure all Shrimp tasks are completed or explicitly cancelled.
+
+## Repo conventions
+
+- **MCP server config** lives in `.cursor/mcp.json` and registers `shrimp-task-manager`.
+- **Task data directory** is `.shrimp/` at repo root and **must not be committed**.
+
+## Notes
+
+- If Shrimp tools are unavailable in a given environment, fall back to the built-in task tracking approach, but keep the same discipline (clear todos, one in-progress at a time, close tasks).

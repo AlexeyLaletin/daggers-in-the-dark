@@ -61,9 +61,15 @@ playwright/.cache/
 .env.local
 .env.*.local
 
+# Shrimp Task Manager (MCP) local data
+.shrimp/
+
 # OS
 .DS_Store
 Thumbs.db
 
 # Build artifacts
 *.log
+
+# Local dev DB (backend)
+backend/data/

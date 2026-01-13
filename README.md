@@ -124,6 +124,10 @@ SKIP=backend-tests,frontend-tests git commit
 
 See [PRE_COMMIT_USAGE.md](PRE_COMMIT_USAGE.md) for details.
 
+### Shrimp Task Manager (Cursor MCP)
+
+This repo includes a project-level Cursor MCP config for **Shrimp Task Manager** in `.cursor/mcp.json` and an always-applied rule in `.cursor/rules/practices/shrimp_task_manager.mdc`.
+
 ## Documentation
 
 - **[Docs/TZ.md](Docs/TZ.md)** - Technical Specification (requirements, use cases)
