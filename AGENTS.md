@@ -6,6 +6,22 @@ This repository includes a set of Cursor agents and rules to keep code quality c
 
 All guidance here is **vendor-neutral** (no internal tooling assumptions) and should work in any Git-based repository.
 
+## Project-Specific Rules (must-follow)
+
+### Technical Specification (ТЗ) is the source of truth
+
+- All code and documentation changes **must conform to** [`Docs/TZ.md`](Docs/TZ.md).
+- If a requested change is **not covered** by the ТЗ, treat it as a spec gap: ask the user and then update the ТЗ to include the decision before implementing.
+
+### Questions, ambiguities, and contradictions
+
+- If you have questions or ambiguity while implementing, you **must ask the user directly** before proceeding with assumptions.
+- Any open questions, clarifications, or decisions **must be recorded in** [`Docs/TZ.md`](Docs/TZ.md) so the spec stays up to date.
+- If you detect **contradictions** inside the ТЗ or between the ТЗ and the requested change, you must:
+  - raise the contradiction to the user,
+  - propose a resolution,
+  - and update the ТЗ according to the user’s answer.
+
 ## Quick Start
 
 1. **Select your role** - Choose appropriate role-specific instructions
