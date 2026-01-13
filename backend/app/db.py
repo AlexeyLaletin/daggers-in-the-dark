@@ -1,10 +1,10 @@
 """Database connection and initialization."""
 
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
-from sqlalchemy import create_engine, Engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.models import Base
 

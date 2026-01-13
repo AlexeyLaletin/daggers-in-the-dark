@@ -1,7 +1,6 @@
 """Export/Import API endpoints."""
 
 import shutil
-from pathlib import Path
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -39,7 +38,7 @@ async def export_project(
 
 @router.post("/import", status_code=201)
 async def import_project(
-    file: UploadFile = File(...),
+    file: Annotated[UploadFile, File()],
 ) -> dict[str, str]:
     """
     Import a project from a SQLite database file.
@@ -75,4 +74,4 @@ async def import_project(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to import project: {str(e)}",
-        )
+        ) from e

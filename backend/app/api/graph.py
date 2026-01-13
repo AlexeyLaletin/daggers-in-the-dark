@@ -2,14 +2,15 @@
 
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db import get_session
-from app.models import Link, NotePage
-from app.services.graph import get_backlinks
+from app.dependencies import get_view_mode, require_initialized_project
+from app.models import World
+from app.services.graph_service import GraphService
+from app.services.visibility import ViewMode
 
 router = APIRouter(prefix="/graph", tags=["graph"])
 
@@ -42,25 +43,22 @@ class GraphResponse(BaseModel):
 @router.get("", response_model=GraphResponse)
 async def get_graph(
     session: Annotated[Session, Depends(get_session)],
-    x_view_mode: Annotated[str, Header(alias="X-View-Mode")] = "gm",
+    world: Annotated[World, Depends(require_initialized_project)],
+    view_mode: Annotated[ViewMode, Depends(get_view_mode)] = "gm",
 ) -> GraphResponse:
     """
     Get the full graph of pages and links.
 
     Args:
         session: Database session
-        x_view_mode: View mode (gm or player)
+        world: World instance (ensures project is initialized)
+        view_mode: View mode (gm or player)
 
     Returns:
         Graph with filtered nodes and edges
     """
-    view_mode: Literal["gm", "player"] = "player" if x_view_mode == "player" else "gm"
-
-    # Get pages (nodes)
-    pages_query = select(NotePage)
-    if view_mode == "player":
-        pages_query = pages_query.where(NotePage.scope == "public")
-    pages = session.execute(pages_query).scalars().all()
+    graph_service = GraphService(session)
+    pages, links = graph_service.get_graph(view_mode)
 
     nodes = [
         GraphNode(
@@ -72,14 +70,6 @@ async def get_graph(
         for page in pages
     ]
 
-    # Get links (edges)
-    links_query = select(Link)
-    if view_mode == "player":
-        links_query = links_query.where(Link.scope == "public")
-    links = session.execute(links_query).scalars().all()
-
-    # Filter edges to only include links between visible nodes
-    visible_node_ids = {node.id for node in nodes}
     edges = [
         GraphEdge(
             from_id=link.from_page_id,
@@ -88,7 +78,6 @@ async def get_graph(
             visibility=link.scope,  # Map scope to visibility for API compat
         )
         for link in links
-        if link.from_page_id in visible_node_ids and link.to_page_id in visible_node_ids
     ]
 
     return GraphResponse(nodes=nodes, edges=edges)
@@ -98,7 +87,8 @@ async def get_graph(
 async def get_page_backlinks(
     page_id: str,
     session: Annotated[Session, Depends(get_session)],
-    x_view_mode: Annotated[str, Header(alias="X-View-Mode")] = "gm",
+    world: Annotated[World, Depends(require_initialized_project)],
+    view_mode: Annotated[ViewMode, Depends(get_view_mode)] = "gm",
 ) -> list[dict[str, str]]:
     """
     Get all pages that link to the given page.
@@ -106,17 +96,19 @@ async def get_page_backlinks(
     Args:
         page_id: Target page ID
         session: Database session
-        x_view_mode: View mode (gm or player)
+        world: World instance (ensures project is initialized)
+        view_mode: View mode (gm or player)
 
     Returns:
         List of pages linking to the target
     """
     # Check if page exists
+    from app.models import NotePage
     page = session.get(NotePage, page_id)
     if not page:
         raise HTTPException(status_code=404, detail="Page not found")
 
-    view_mode: Literal["gm", "player"] = "player" if x_view_mode == "player" else "gm"
-    backlink_pages = get_backlinks(session, page_id, view_mode)
+    graph_service = GraphService(session)
+    backlink_pages = graph_service.get_backlinks(page_id, view_mode)
 
     return [{"id": p.id, "title": p.title, "visibility": p.scope} for p in backlink_pages]

@@ -1,6 +1,5 @@
 """Unit tests for GM/Player visibility filter."""
 
-import pytest
 
 
 def test_gm_mode_shows_all_fields() -> None:

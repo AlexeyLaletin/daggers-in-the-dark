@@ -1,12 +1,23 @@
 """FastAPI application entrypoint."""
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import export_import, factions, graph, pages, people, places, snapshots, tiles
+from app.api import (
+    export_import,
+    factions,
+    graph,
+    map_assets,
+    pages,
+    people,
+    places,
+    project,
+    snapshots,
+    tiles,
+)
 from app.db import init_db
 
 
@@ -36,6 +47,7 @@ app.add_middleware(
 )
 
 # Include API routers
+app.include_router(project.router, prefix="/api")
 app.include_router(factions.router, prefix="/api")
 app.include_router(people.router, prefix="/api")
 app.include_router(places.router, prefix="/api")
@@ -43,6 +55,7 @@ app.include_router(pages.router, prefix="/api")
 app.include_router(graph.router, prefix="/api")
 app.include_router(snapshots.router, prefix="/api")
 app.include_router(tiles.router, prefix="/api")
+app.include_router(map_assets.router, prefix="/api")
 app.include_router(export_import.router, prefix="/api")
 
 

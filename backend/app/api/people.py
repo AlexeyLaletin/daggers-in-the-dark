@@ -10,16 +10,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db import get_session
+from app.dependencies import get_view_mode, require_initialized_project
 from app.models import Person, World
 from app.schemas import PersonCreate, PersonResponse, PersonUpdate
-
-
-def get_default_world_id(session: Session) -> str:
-    """Get the default world ID (first world in DB)."""
-    world = session.execute(select(World)).scalars().first()
-    if not world:
-        raise HTTPException(status_code=500, detail="No world found in database")
-    return world.id
+from app.services.visibility import ViewMode, VisibilityService
 
 router = APIRouter(prefix="/people", tags=["people"])
 
@@ -27,17 +21,32 @@ router = APIRouter(prefix="/people", tags=["people"])
 @router.get("", response_model=list[PersonResponse])
 async def list_people(
     session: Annotated[Session, Depends(get_session)],
-) -> list[dict[str, str | list[str] | datetime | None]]:
+    world: Annotated[World, Depends(require_initialized_project)],
+    view_mode: Annotated[ViewMode, Depends(get_view_mode)] = "gm",
+) -> list[dict[str, object]]:
     """List all people."""
     people = session.execute(select(Person)).scalars().all()
-    # Convert JSON strings to lists for response
+    visibility = VisibilityService()
+
+    # Convert JSON strings to lists and apply visibility filter
     return [
-        {
-            **person.model_dump(),
-            "aliases": json.loads(person.aliases) if person.aliases else [],
-            "tags": json.loads(person.tags) if person.tags else [],
-        }
-        for person in people
+        visibility.filter_notes_gm(
+            {
+                "id": p.id,
+                "name": p.name,
+                "aliases": json.loads(p.aliases) if p.aliases else [],
+                "status": p.status,
+                "workplace_place_id": p.workplace_place_id,
+                "home_place_id": p.home_place_id,
+                "tags": json.loads(p.tags) if p.tags else [],
+                "notes_public": p.notes_public,
+                "notes_gm": p.notes_gm,
+                "created_at": p.created_at,
+                "updated_at": p.updated_at,
+            },
+            view_mode
+        )
+        for p in people
     ]
 
 
@@ -45,12 +54,12 @@ async def list_people(
 async def create_person(
     person_data: PersonCreate,
     session: Annotated[Session, Depends(get_session)],
-) -> dict[str, str | list[str] | datetime | None]:
+    world: Annotated[World, Depends(require_initialized_project)],
+) -> dict[str, object]:
     """Create a new person."""
-    world_id = get_default_world_id(session)
     person = Person(
         id=str(uuid.uuid4()),
-        world_id=world_id,
+        world_id=world.id,
         name=person_data.name,
         aliases=json.dumps(person_data.aliases) if person_data.aliases else None,
         status=person_data.status,
@@ -65,9 +74,17 @@ async def create_person(
     session.refresh(person)
 
     return {
-        **person.model_dump(),
+        "id": person.id,
+        "name": person.name,
         "aliases": json.loads(person.aliases) if person.aliases else [],
+        "status": person.status,
+        "workplace_place_id": person.workplace_place_id,
+        "home_place_id": person.home_place_id,
         "tags": json.loads(person.tags) if person.tags else [],
+        "notes_public": person.notes_public,
+        "notes_gm": person.notes_gm,
+        "created_at": person.created_at,
+        "updated_at": person.updated_at,
     }
 
 
@@ -75,17 +92,31 @@ async def create_person(
 async def get_person(
     person_id: str,
     session: Annotated[Session, Depends(get_session)],
-) -> dict[str, str | list[str] | datetime | None]:
+    world: Annotated[World, Depends(require_initialized_project)],
+    view_mode: Annotated[ViewMode, Depends(get_view_mode)] = "gm",
+) -> dict[str, object]:
     """Get a person by ID."""
     person = session.get(Person, person_id)
     if not person:
         raise HTTPException(status_code=404, detail="Person not found")
 
-    return {
-        **person.model_dump(),
-        "aliases": json.loads(person.aliases) if person.aliases else [],
-        "tags": json.loads(person.tags) if person.tags else [],
-    }
+    visibility = VisibilityService()
+    return visibility.filter_notes_gm(
+        {
+            "id": person.id,
+            "name": person.name,
+            "aliases": json.loads(person.aliases) if person.aliases else [],
+            "status": person.status,
+            "workplace_place_id": person.workplace_place_id,
+            "home_place_id": person.home_place_id,
+            "tags": json.loads(person.tags) if person.tags else [],
+            "notes_public": person.notes_public,
+            "notes_gm": person.notes_gm,
+            "created_at": person.created_at,
+            "updated_at": person.updated_at,
+        },
+        view_mode
+    )
 
 
 @router.put("/{person_id}", response_model=PersonResponse)
@@ -93,7 +124,8 @@ async def update_person(
     person_id: str,
     person_data: PersonUpdate,
     session: Annotated[Session, Depends(get_session)],
-) -> dict[str, str | list[str] | datetime | None]:
+    world: Annotated[World, Depends(require_initialized_project)],
+) -> dict[str, object]:
     """Update a person."""
     person = session.get(Person, person_id)
     if not person:
@@ -115,9 +147,17 @@ async def update_person(
     session.refresh(person)
 
     return {
-        **person.model_dump(),
+        "id": person.id,
+        "name": person.name,
         "aliases": json.loads(person.aliases) if person.aliases else [],
+        "status": person.status,
+        "workplace_place_id": person.workplace_place_id,
+        "home_place_id": person.home_place_id,
         "tags": json.loads(person.tags) if person.tags else [],
+        "notes_public": person.notes_public,
+        "notes_gm": person.notes_gm,
+        "created_at": person.created_at,
+        "updated_at": person.updated_at,
     }
 
 
@@ -125,6 +165,7 @@ async def update_person(
 async def delete_person(
     person_id: str,
     session: Annotated[Session, Depends(get_session)],
+    world: Annotated[World, Depends(require_initialized_project)],
 ) -> None:
     """Delete a person."""
     person = session.get(Person, person_id)

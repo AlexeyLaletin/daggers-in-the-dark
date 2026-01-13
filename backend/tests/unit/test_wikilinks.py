@@ -1,6 +1,5 @@
 """Unit tests for wikilinks parser."""
 
-import pytest
 
 
 def test_parse_simple_wikilink() -> None:

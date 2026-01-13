@@ -262,7 +262,39 @@ graph TB
 ```
 - Response: `200 OK`
 
-#### 2.3.8 Export/Import API
+**DELETE /api/snapshots/{snapshot_id}/territory/tiles**
+- Query params: `?faction_id={id}`
+- Response: `200 OK` + deleted count
+
+#### 2.3.8 Map Assets API
+
+**POST /api/snapshots/{snapshot_id}/map**
+- Body: multipart/form-data with image file
+- Request example:
+```
+Content-Type: multipart/form-data
+file=(binary image data)
+```
+- Response: `201 Created`
+```typescript
+{
+  status: "ok";
+  message: "Map uploaded successfully";
+  map_asset_id: string;
+  snapshot_id: string;
+}
+```
+- Notes: Replaces existing map if already present (1 map per snapshot)
+
+**GET /api/snapshots/{snapshot_id}/map**
+- Response: `200 OK` + binary image data
+- Headers: `Content-Type: image/png`
+- Response: PNG/JPEG image file
+
+**DELETE /api/snapshots/{snapshot_id}/map**
+- Response: `204 No Content`
+
+#### 2.3.9 Export/Import API
 
 **GET /api/export**
 - Response: `200 OK` + SQLite file (binary)
@@ -362,6 +394,7 @@ CREATE TABLE places (
     position TEXT, -- JSON {x, y} или NULL
     owner_faction_id TEXT,
     parent_place_id TEXT, -- для иерархии (район -> здание)
+    scope TEXT NOT NULL DEFAULT 'public', -- public|gm|player
     notes_public TEXT,
     notes_gm TEXT,
     created_at TEXT NOT NULL,
@@ -481,6 +514,7 @@ CREATE INDEX idx_factions_world ON factions(world_id);
 CREATE INDEX idx_people_world ON people(world_id);
 CREATE INDEX idx_places_world ON places(world_id);
 CREATE INDEX idx_places_parent ON places(parent_place_id);
+CREATE INDEX idx_places_scope ON places(scope);
 CREATE INDEX idx_note_pages_world ON note_pages(world_id);
 CREATE INDEX idx_note_pages_title ON note_pages(world_id, title);
 CREATE INDEX idx_links_world ON links(world_id);

@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import ForeignKey, Text, Float, Integer, LargeBinary, CheckConstraint
+from sqlalchemy import CheckConstraint, Float, ForeignKey, Integer, LargeBinary, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -19,7 +19,7 @@ class World(Base):
 
     id: Mapped[str] = mapped_column(Text, primary_key=True)
     name: Mapped[str] = mapped_column(Text, nullable=False, index=True)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     timezone: Mapped[str] = mapped_column(Text, nullable=False, default="UTC")
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -43,8 +43,8 @@ class Faction(Base):
     name: Mapped[str] = mapped_column(Text, nullable=False, index=True)
     color: Mapped[str] = mapped_column(Text, nullable=False)  # hex #RRGGBB
     opacity: Mapped[float] = mapped_column(Float, nullable=False, default=0.4)
-    notes_public: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    notes_gm: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    notes_public: Mapped[str | None] = mapped_column(Text, nullable=True)
+    notes_gm: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -62,13 +62,13 @@ class Person(Base):
     id: Mapped[str] = mapped_column(Text, primary_key=True)
     world_id: Mapped[str] = mapped_column(ForeignKey("worlds.id"), nullable=False, index=True)
     name: Mapped[str] = mapped_column(Text, nullable=False, index=True)
-    aliases: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON string of array
+    aliases: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON string of array
     status: Mapped[str] = mapped_column(Text, nullable=False, default="alive")  # alive|dead|unknown
-    workplace_place_id: Mapped[Optional[str]] = mapped_column(ForeignKey("places.id"), nullable=True)
-    home_place_id: Mapped[Optional[str]] = mapped_column(ForeignKey("places.id"), nullable=True)
-    tags: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON string of array
-    notes_public: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    notes_gm: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    workplace_place_id: Mapped[str | None] = mapped_column(ForeignKey("places.id"), nullable=True)
+    home_place_id: Mapped[str | None] = mapped_column(ForeignKey("places.id"), nullable=True)
+    tags: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON string of array
+    notes_public: Mapped[str | None] = mapped_column(Text, nullable=True)
+    notes_gm: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -86,8 +86,8 @@ class PlayerCharacter(Base):
     __tablename__ = "player_characters"
 
     person_id: Mapped[str] = mapped_column(ForeignKey("people.id", ondelete="CASCADE"), primary_key=True)
-    playbook: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    crew: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    playbook: Mapped[str | None] = mapped_column(Text, nullable=True)
+    crew: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
 
     # Relationships
@@ -102,7 +102,7 @@ class FactionMembership(Base):
     id: Mapped[str] = mapped_column(Text, primary_key=True)
     person_id: Mapped[str] = mapped_column(ForeignKey("people.id", ondelete="CASCADE"), nullable=False, index=True)
     faction_id: Mapped[str] = mapped_column(ForeignKey("factions.id", ondelete="CASCADE"), nullable=False, index=True)
-    role: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    role: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Relationships
     person: Mapped["Person"] = relationship(back_populates="memberships")
@@ -118,11 +118,12 @@ class Place(Base):
     world_id: Mapped[str] = mapped_column(ForeignKey("worlds.id"), nullable=False, index=True)
     name: Mapped[str] = mapped_column(Text, nullable=False, index=True)
     type: Mapped[str] = mapped_column(Text, nullable=False)  # building|district|landmark|other
-    position: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON {x, y}
-    owner_faction_id: Mapped[Optional[str]] = mapped_column(ForeignKey("factions.id", ondelete="SET NULL"), nullable=True)
-    parent_place_id: Mapped[Optional[str]] = mapped_column(ForeignKey("places.id", ondelete="SET NULL"), nullable=True, index=True)
-    notes_public: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    notes_gm: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    position: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON {x, y}
+    owner_faction_id: Mapped[str | None] = mapped_column(ForeignKey("factions.id", ondelete="SET NULL"), nullable=True)
+    parent_place_id: Mapped[str | None] = mapped_column(ForeignKey("places.id", ondelete="SET NULL"), nullable=True, index=True)
+    scope: Mapped[str] = mapped_column(Text, nullable=False, default="public")  # public|gm|player
+    notes_public: Mapped[str | None] = mapped_column(Text, nullable=True)
+    notes_gm: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -144,8 +145,8 @@ class NotePage(Base):
     title: Mapped[str] = mapped_column(Text, nullable=False, index=True)
     body_markdown: Mapped[str] = mapped_column(Text, nullable=False)
     scope: Mapped[str] = mapped_column(Text, nullable=False, default="public")  # public|gm|player
-    entity_type: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # faction|person|place
-    entity_id: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    entity_type: Mapped[str | None] = mapped_column(Text, nullable=True)  # faction|person|place
+    entity_id: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -166,7 +167,7 @@ class Link(Base):
     to_page_id: Mapped[str] = mapped_column(ForeignKey("note_pages.id", ondelete="CASCADE"), nullable=False, index=True)
     link_type: Mapped[str] = mapped_column(Text, nullable=False)  # wikilink|manual|reference
     scope: Mapped[str] = mapped_column(Text, nullable=False, default="public")  # public|gm|player
-    meta: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON metadata
+    meta: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON metadata
 
     # Relationships
     world: Mapped["World"] = relationship()
@@ -245,9 +246,9 @@ class Event(Base):
     world_id: Mapped[str] = mapped_column(ForeignKey("worlds.id"), nullable=False, index=True)
     at_datetime: Mapped[datetime] = mapped_column(nullable=False, index=True)
     title: Mapped[str] = mapped_column(Text, nullable=False)
-    body_markdown: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    body_markdown: Mapped[str | None] = mapped_column(Text, nullable=True)
     scope: Mapped[str] = mapped_column(Text, nullable=False, default="gm")  # public|gm|player
-    snapshot_id: Mapped[Optional[str]] = mapped_column(ForeignKey("snapshots.id", ondelete="SET NULL"), nullable=True)
+    snapshot_id: Mapped[str | None] = mapped_column(ForeignKey("snapshots.id", ondelete="SET NULL"), nullable=True)
 
     # Relationships
     world: Mapped["World"] = relationship(back_populates="events")
@@ -263,7 +264,7 @@ class EventRef(Base):
     event_id: Mapped[str] = mapped_column(ForeignKey("events.id", ondelete="CASCADE"), nullable=False, index=True)
     entity_type: Mapped[str] = mapped_column(Text, nullable=False, index=True)  # faction|person|place|page
     entity_id: Mapped[str] = mapped_column(Text, nullable=False, index=True)
-    role: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # involved|location|target|etc
+    role: Mapped[str | None] = mapped_column(Text, nullable=True)  # involved|location|target|etc
 
     # Relationships
     event: Mapped["Event"] = relationship(back_populates="refs")

@@ -1,7 +1,6 @@
 """Pydantic schemas for request/response validation."""
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -13,18 +12,18 @@ class FactionCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     color: str = Field(..., pattern=r"^#[0-9A-Fa-f]{6}$")
     opacity: float = Field(default=0.4, ge=0.0, le=1.0)
-    notes_public: Optional[str] = None
-    notes_gm: Optional[str] = None
+    notes_public: str | None = None
+    notes_gm: str | None = None
 
 
 class FactionUpdate(BaseModel):
     """Schema for updating a faction."""
 
-    name: Optional[str] = Field(None, min_length=1, max_length=100)
-    color: Optional[str] = Field(None, pattern=r"^#[0-9A-Fa-f]{6}$")
-    opacity: Optional[float] = Field(None, ge=0.0, le=1.0)
-    notes_public: Optional[str] = None
-    notes_gm: Optional[str] = None
+    name: str | None = Field(None, min_length=1, max_length=100)
+    color: str | None = Field(None, pattern=r"^#[0-9A-Fa-f]{6}$")
+    opacity: float | None = Field(None, ge=0.0, le=1.0)
+    notes_public: str | None = None
+    notes_gm: str | None = None
 
 
 class FactionResponse(BaseModel):
@@ -34,8 +33,8 @@ class FactionResponse(BaseModel):
     name: str
     color: str
     opacity: float
-    notes_public: Optional[str] = None
-    notes_gm: Optional[str] = None
+    notes_public: str | None = None
+    notes_gm: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -50,26 +49,26 @@ class PersonCreate(BaseModel):
     """Schema for creating a person."""
 
     name: str = Field(..., min_length=1, max_length=100)
-    aliases: Optional[list[str]] = None
+    aliases: list[str] | None = None
     status: str = Field(default="alive")
-    workplace_place_id: Optional[str] = None
-    home_place_id: Optional[str] = None
-    tags: Optional[list[str]] = None
-    notes_public: Optional[str] = None
-    notes_gm: Optional[str] = None
+    workplace_place_id: str | None = None
+    home_place_id: str | None = None
+    tags: list[str] | None = None
+    notes_public: str | None = None
+    notes_gm: str | None = None
 
 
 class PersonUpdate(BaseModel):
     """Schema for updating a person."""
 
-    name: Optional[str] = Field(None, min_length=1, max_length=100)
-    aliases: Optional[list[str]] = None
-    status: Optional[str] = None
-    workplace_place_id: Optional[str] = None
-    home_place_id: Optional[str] = None
-    tags: Optional[list[str]] = None
-    notes_public: Optional[str] = None
-    notes_gm: Optional[str] = None
+    name: str | None = Field(None, min_length=1, max_length=100)
+    aliases: list[str] | None = None
+    status: str | None = None
+    workplace_place_id: str | None = None
+    home_place_id: str | None = None
+    tags: list[str] | None = None
+    notes_public: str | None = None
+    notes_gm: str | None = None
 
 
 class PersonResponse(BaseModel):
@@ -79,11 +78,11 @@ class PersonResponse(BaseModel):
     name: str
     aliases: list[str]
     status: str
-    workplace_place_id: Optional[str] = None
-    home_place_id: Optional[str] = None
+    workplace_place_id: str | None = None
+    home_place_id: str | None = None
     tags: list[str]
-    notes_public: Optional[str] = None
-    notes_gm: Optional[str] = None
+    notes_public: str | None = None
+    notes_gm: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -99,21 +98,23 @@ class PlaceCreate(BaseModel):
 
     name: str = Field(..., min_length=1, max_length=100)
     type: str = Field(..., pattern=r"^(building|district|landmark|other)$")
-    position: Optional[dict[str, float]] = None
-    owner_faction_id: Optional[str] = None
-    notes_public: Optional[str] = None
-    notes_gm: Optional[str] = None
+    position: dict[str, float] | None = None
+    owner_faction_id: str | None = None
+    scope: str = Field(default="public", pattern=r"^(public|gm|player)$")
+    notes_public: str | None = None
+    notes_gm: str | None = None
 
 
 class PlaceUpdate(BaseModel):
     """Schema for updating a place."""
 
-    name: Optional[str] = Field(None, min_length=1, max_length=100)
-    type: Optional[str] = Field(None, pattern=r"^(building|district|landmark|other)$")
-    position: Optional[dict[str, float]] = None
-    owner_faction_id: Optional[str] = None
-    notes_public: Optional[str] = None
-    notes_gm: Optional[str] = None
+    name: str | None = Field(None, min_length=1, max_length=100)
+    type: str | None = Field(None, pattern=r"^(building|district|landmark|other)$")
+    position: dict[str, float] | None = None
+    owner_faction_id: str | None = None
+    scope: str | None = Field(None, pattern=r"^(public|gm|player)$")
+    notes_public: str | None = None
+    notes_gm: str | None = None
 
 
 class PlaceResponse(BaseModel):
@@ -122,10 +123,11 @@ class PlaceResponse(BaseModel):
     id: str
     name: str
     type: str
-    position: Optional[dict[str, float]] = None
-    owner_faction_id: Optional[str] = None
-    notes_public: Optional[str] = None
-    notes_gm: Optional[str] = None
+    position: dict[str, float] | None = None
+    owner_faction_id: str | None = None
+    scope: str
+    notes_public: str | None = None
+    notes_gm: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -141,19 +143,19 @@ class NotePageCreate(BaseModel):
 
     title: str = Field(..., min_length=1, max_length=200)
     body_markdown: str
-    visibility: str = Field(default="public", pattern=r"^(public|gm)$")
-    entity_type: Optional[str] = Field(None, pattern=r"^(faction|person|place)$")
-    entity_id: Optional[str] = None
+    visibility: str = Field(default="public", pattern=r"^(public|gm|player)$")
+    entity_type: str | None = Field(None, pattern=r"^(faction|person|place)$")
+    entity_id: str | None = None
 
 
 class NotePageUpdate(BaseModel):
     """Schema for updating a note page."""
 
-    title: Optional[str] = Field(None, min_length=1, max_length=200)
-    body_markdown: Optional[str] = None
-    visibility: Optional[str] = Field(None, pattern=r"^(public|gm)$")
-    entity_type: Optional[str] = Field(None, pattern=r"^(faction|person|place)$")
-    entity_id: Optional[str] = None
+    title: str | None = Field(None, min_length=1, max_length=200)
+    body_markdown: str | None = None
+    visibility: str | None = Field(None, pattern=r"^(public|gm|player)$")
+    entity_type: str | None = Field(None, pattern=r"^(faction|person|place)$")
+    entity_id: str | None = None
 
 
 class NotePageResponse(BaseModel):
@@ -162,9 +164,9 @@ class NotePageResponse(BaseModel):
     id: str
     title: str
     body_markdown: str
-    visibility: str
-    entity_type: Optional[str] = None
-    entity_id: Optional[str] = None
+    visibility: str  # API uses 'visibility', but model uses 'scope'
+    entity_type: str | None = None
+    entity_id: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -172,3 +174,22 @@ class NotePageResponse(BaseModel):
         """Pydantic config."""
 
         from_attributes = True
+
+    @classmethod
+    def from_orm(cls, obj: object) -> "NotePageResponse":
+        """Custom from_orm to map scope to visibility."""
+        from app.models import NotePage
+
+        if not isinstance(obj, NotePage):
+            raise TypeError("Expected NotePage instance")
+
+        return cls(
+            id=obj.id,
+            title=obj.title,
+            body_markdown=obj.body_markdown,
+            visibility=obj.scope,  # Map scope to visibility
+            entity_type=obj.entity_type,
+            entity_id=obj.entity_id,
+            created_at=obj.created_at,
+            updated_at=obj.updated_at,
+        )

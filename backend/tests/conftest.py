@@ -2,32 +2,31 @@
 
 import json
 import uuid
-from datetime import datetime, timedelta
+from collections.abc import Generator
+from datetime import datetime
 from pathlib import Path
-from typing import Generator
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, Engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
-from app.db import get_session, Base
-from app.main import app
+from app.db import Base, get_session
 from app.models import (
-    World,
-    Faction,
-    Person,
-    PlayerCharacter,
-    FactionMembership,
-    Place,
-    NotePage,
-    Link,
-    Snapshot,
     ActiveSnapshot,
-    TerritoryTile,
     Event,
     EventRef,
+    Faction,
+    FactionMembership,
+    NotePage,
+    Person,
+    Place,
+    PlayerCharacter,
     ProjectMeta,
+    Snapshot,
+    TerritoryTile,
+    World,
 )
 
 # Deterministic UUID namespace for test data
@@ -40,10 +39,9 @@ def make_uuid(name: str) -> str:
 
 
 @pytest.fixture(scope="function")
-def temp_db_engine(tmp_path_factory: pytest.TempPathFactory) -> Generator[Engine, None, None]:
+def temp_db_engine(tmp_path: Path) -> Generator[Engine, None, None]:
     """Create a temporary SQLite database engine for testing."""
-    db_dir = tmp_path_factory.mktemp("test_db")
-    db_path = db_dir / "test_blades.db"
+    db_path = tmp_path / "test_blades.db"
 
     engine = create_engine(
         f"sqlite:///{db_path}",
@@ -77,16 +75,85 @@ def db_session(temp_db_engine: Engine) -> Generator[Session, None, None]:
 @pytest.fixture(scope="function")
 def client(db_session: Session) -> TestClient:
     """Create a test client with overridden database dependency."""
+    # Create test app without lifespan to avoid init_db() using global DATABASE_PATH
+    from fastapi.middleware.cors import CORSMiddleware
+
+    from app.api import (
+        export_import,
+        factions,
+        graph,
+        map_assets,
+        pages,
+        people,
+        places,
+        project,
+        snapshots,
+        tiles,
+    )
+
+    test_app = FastAPI(
+        title="Blades Faction Map API (Test)",
+        description="Test instance",
+        version="0.1.0",
+    )
+
+    # CORS for local Electron renderer
+    test_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:*", "http://127.0.0.1:*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    # Include API routers
+    test_app.include_router(project.router, prefix="/api")
+    test_app.include_router(factions.router, prefix="/api")
+    test_app.include_router(people.router, prefix="/api")
+    test_app.include_router(places.router, prefix="/api")
+    test_app.include_router(pages.router, prefix="/api")
+    test_app.include_router(graph.router, prefix="/api")
+    test_app.include_router(snapshots.router, prefix="/api")
+    test_app.include_router(tiles.router, prefix="/api")
+    test_app.include_router(map_assets.router, prefix="/api")
+    test_app.include_router(export_import.router, prefix="/api")
+
+    # Health and root endpoints
+    @test_app.get("/health")
+    async def health() -> dict[str, str]:
+        return {"status": "ok"}
+
+    @test_app.get("/")
+    async def root() -> dict[str, str]:
+        return {"message": "Blades Faction Map API (Test)"}
+
     def override_get_session() -> Generator[Session, None, None]:
         yield db_session
 
-    app.dependency_overrides[get_session] = override_get_session
+    test_app.dependency_overrides[get_session] = override_get_session
 
-    test_client = TestClient(app)
+    test_client = TestClient(test_app, raise_server_exceptions=True)
 
     yield test_client
 
-    app.dependency_overrides.clear()
+    test_app.dependency_overrides.clear()
+
+
+@pytest.fixture(scope="function")
+def initialized_client(client: TestClient) -> TestClient:
+    """Create a test client with initialized project."""
+    # Initialize project via API
+    response = client.post(
+        "/api/project/init",
+        json={
+            "world_name": "Doskvol",
+            "timezone": "UTC",
+            "initial_snapshot_date": "1847-01-01T00:00:00Z",
+            "initial_snapshot_label": "Initial",
+        }
+    )
+    assert response.status_code == 201
+    return client
 
 
 @pytest.fixture(scope="function")
@@ -495,34 +562,19 @@ def seed_small_town(db_session: Session) -> dict[str, any]:
 
     # === 9. Links (wikilinks) ===
     # Links will be created based on wikilink parsing in pages
-    links = [
-        Link(
-            id=make_uuid("link_crows_crowsfoot"),
-            world_id=world.id,
-            from_page_id=page_crows.id,
-            to_page_id=NotePage(title="Crows_Foot").title,  # Would resolve to place page if existed
-            link_type="wikilink",
-            scope="public",
-        ),
-        Link(
-            id=make_uuid("link_leakybucket_crowsfoot"),
-            world_id=world.id,
-            from_page_id=page_leaky_bucket.id,
-            to_page_id=page_crows.id,
-            link_type="wikilink",
-            scope="public",
-        ),
-        Link(
-            id=make_uuid("link_lyssa_leakybucket"),
-            world_id=world.id,
-            from_page_id=page_lyssa.id,
-            to_page_id=page_leaky_bucket.id,
-            link_type="wikilink",
-            scope="public",
-        ),
-    ]
-    # Simplified - in real app, wikilinks parser would create these
-    # db_session.add_all(links)  # Skip for now to avoid complexity
+    # Simplified - in real app, wikilinks parser would create these automatically
+    # Example:
+    # links = [
+    #     Link(
+    #         id=make_uuid("link_crows_crowsfoot"),
+    #         world_id=world.id,
+    #         from_page_id=page_crows.id,
+    #         to_page_id=NotePage(title="Crows_Foot").title,
+    #         link_type="wikilink",
+    #         scope="public",
+    #     ),
+    # ]
+    # db_session.add_all(links)
 
     # === 10. Territory Tiles (minimal test data) ===
     # Create tiny 1x1 PNG placeholder for testing
@@ -706,21 +758,8 @@ def seed_small_town(db_session: Session) -> dict[str, any]:
     }
 
 
-# Autouse fixture to create a world before each test
-@pytest.fixture(autouse=True)
-def ensure_world_exists(db_session: Session) -> str:
-    """Ensure a default world exists for tests that don't use seed_small_town."""
-    world = World(
-        id=make_uuid("default_test_world"),
-        name="Test_World",
-        description="Default test world",
-        timezone="UTC",
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
-    )
-    db_session.add(world)
-    db_session.commit()
-    return world.id
+# Note: No longer using autouse world fixture.
+# Tests should explicitly initialize project via POST /api/project/init or use initialized_client fixture.
 
 
 # Legacy fixtures for backward compatibility
