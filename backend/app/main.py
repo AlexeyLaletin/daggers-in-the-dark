@@ -6,7 +6,7 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import factions, graph, pages, people, places, snapshots
+from app.api import factions, graph, pages, people, places, snapshots, tiles
 from app.db import init_db
 
 
@@ -42,6 +42,7 @@ app.include_router(places.router, prefix="/api")
 app.include_router(pages.router, prefix="/api")
 app.include_router(graph.router, prefix="/api")
 app.include_router(snapshots.router, prefix="/api")
+app.include_router(tiles.router, prefix="/api")
 
 
 @app.get("/health")
