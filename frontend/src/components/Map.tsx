@@ -1,31 +1,82 @@
-/**
- * Map component placeholder
- * TODO: Implement Canvas rendering, pan/zoom, territory painting
- */
+import { useState } from "react";
+import { MapCanvas } from "./MapCanvas";
+import { MapToolbar } from "./MapToolbar";
+import { LayerControl } from "./LayerControl";
+import { AddPlaceForm } from "./AddPlaceForm";
+import { useMap } from "../contexts/MapContext";
 
 export function Map(): JSX.Element {
+  const { mapState, setMode } = useMap();
+  const [pendingPlace, setPendingPlace] = useState<{ x: number; y: number } | null>(null);
+
+  const handleMapClick = (x: number, y: number) => {
+    if (mapState.mode === "add-poi") {
+      setPendingPlace({ x, y });
+    }
+  };
+
+  const handlePlaceCreated = () => {
+    setPendingPlace(null);
+    setMode("pan");
+    // Reload places - MapCanvas will handle this via useEffect
+  };
+
+  const handleCancel = () => {
+    setPendingPlace(null);
+    setMode("pan");
+  };
+
   return (
     <div
       style={{
         flex: 1,
+        position: "relative",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#f0f0f0",
-        border: "2px dashed #ccc",
+        flexDirection: "column",
+        overflow: "hidden",
       }}
     >
-      <div style={{ textAlign: "center" }}>
-        <h2>Map Canvas</h2>
-        <p>Territory painting will be implemented here</p>
-        <p style={{ fontSize: "0.9rem", color: "#666" }}>
-          Features:
-          <br />- Base map loading
-          <br />- Pan/zoom controls
-          <br />- Brush/eraser tools
-          <br />- Semi-transparent faction overlays
-        </p>
-      </div>
+      <MapToolbar />
+      <LayerControl />
+      <MapCanvas onMapClick={handleMapClick} />
+
+      {/* Add Place Form Modal */}
+      {pendingPlace && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 1000,
+            maxWidth: "400px",
+            width: "90%",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+          }}
+        >
+          <AddPlaceForm
+            position={pendingPlace}
+            onSuccess={handlePlaceCreated}
+            onCancel={handleCancel}
+          />
+        </div>
+      )}
+
+      {/* Backdrop when form is open */}
+      {pendingPlace && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.3)",
+            zIndex: 999,
+          }}
+          onClick={handleCancel}
+        />
+      )}
     </div>
   );
 }

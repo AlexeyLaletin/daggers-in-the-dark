@@ -104,5 +104,8 @@ See `.cursor/rules/reference/project_structure.mdc` for Python project structure
 - **MUST**: Use Ruff for linting and formatting (configure in `.ruff.toml`)
 - **MUST**: Enable strict type checking with Mypy (configure in `mypy.ini`)
 - **SHOULD**: Configure pre-commit hooks for Ruff and Mypy
+- **MUST**: Use `python3` when invoking the interpreter (and `python3 -m ...` for modules); do **not** rely on `python`
+- **MUST**: Use `#!/usr/bin/env python3` for Python script shebangs (avoid `#!/usr/bin/env python`)
+- **SHOULD**: Prefer `uv` for virtualenv + dependency management and for running tools (`uv venv`, `uv sync`, `uv run ...`)
 - See `.cursor/rules/setup/python_tools.mdc` for setup instructions
 - See `.cursor/rules/reference/commands.mdc` for all commands

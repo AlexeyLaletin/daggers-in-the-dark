@@ -1,11 +1,11 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import App from "../App";
 
 describe("App integration tests", () => {
   beforeEach(() => {
     // Mock fetch for API calls
-    global.fetch = vi.fn();
+    globalThis.fetch = vi.fn();
   });
 
   it("renders without crashing", () => {
