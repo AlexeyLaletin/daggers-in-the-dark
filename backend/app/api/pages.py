@@ -1,0 +1,103 @@
+"""Note pages API endpoints."""
+
+import uuid
+from datetime import datetime
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+
+from app.db import get_session
+from app.models import NotePage
+from app.schemas import NotePageCreate, NotePageResponse, NotePageUpdate
+
+router = APIRouter(prefix="/pages", tags=["pages"])
+
+
+@router.get("", response_model=list[NotePageResponse])
+async def list_pages(
+    session: Annotated[Session, Depends(get_session)],
+) -> list[NotePage]:
+    """List all note pages."""
+    pages = session.exec(select(NotePage)).all()
+    return list(pages)
+
+
+@router.post("", response_model=NotePageResponse, status_code=201)
+async def create_page(
+    page_data: NotePageCreate,
+    session: Annotated[Session, Depends(get_session)],
+) -> NotePage:
+    """Create a new note page."""
+    # Check for duplicate title
+    existing = session.exec(select(NotePage).where(NotePage.title == page_data.title)).first()
+    if existing:
+        raise HTTPException(status_code=409, detail="Page with this title already exists")
+
+    page = NotePage(
+        id=str(uuid.uuid4()),
+        title=page_data.title,
+        body_markdown=page_data.body_markdown,
+        visibility=page_data.visibility,
+        entity_type=page_data.entity_type,
+        entity_id=page_data.entity_id,
+    )
+    session.add(page)
+    session.commit()
+    session.refresh(page)
+    return page
+
+
+@router.get("/{page_id}", response_model=NotePageResponse)
+async def get_page(
+    page_id: str,
+    session: Annotated[Session, Depends(get_session)],
+) -> NotePage:
+    """Get a note page by ID."""
+    page = session.get(NotePage, page_id)
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+    return page
+
+
+@router.put("/{page_id}", response_model=NotePageResponse)
+async def update_page(
+    page_id: str,
+    page_data: NotePageUpdate,
+    session: Annotated[Session, Depends(get_session)],
+) -> NotePage:
+    """Update a note page."""
+    page = session.get(NotePage, page_id)
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+
+    # Check for duplicate title if title is being changed
+    if page_data.title and page_data.title != page.title:
+        existing = session.exec(select(NotePage).where(NotePage.title == page_data.title)).first()
+        if existing:
+            raise HTTPException(status_code=409, detail="Page with this title already exists")
+
+    # Update only provided fields
+    update_data = page_data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(page, field, value)
+
+    page.updated_at = datetime.utcnow()
+    session.add(page)
+    session.commit()
+    session.refresh(page)
+    return page
+
+
+@router.delete("/{page_id}", status_code=204)
+async def delete_page(
+    page_id: str,
+    session: Annotated[Session, Depends(get_session)],
+) -> None:
+    """Delete a note page."""
+    page = session.get(NotePage, page_id)
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+
+    session.delete(page)
+    session.commit()
