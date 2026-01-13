@@ -17,6 +17,56 @@ alwaysApply: false
 
 This guide covers setting up Python development tools (Ruff, Mypy, pre-commit) in a typical Git-based repository.
 
+## uv (Recommended)
+
+Use `uv` for virtualenv + dependency management and for running tools inside the project environment.
+
+- **Standard**: Prefer `uv run ...` for running Python tools.
+- **Interpreter**: If you invoke Python directly, use `python3` (and `python3 -m ...`), not `python`.
+- **Activation**: When you use `uv run ...`, you generally do **not** need to activate `.venv` (`source .venv/bin/activate`).
+
+```bash
+# Create a virtual environment (in-project, if configured; otherwise default uv location)
+uv venv
+
+# If you have a lockfile, prefer a locked sync (repeatable environments)
+uv sync --locked --dev --all-extras
+
+# If you do NOT have a lockfile yet (or you intentionally use pip-compatible mode)
+# install dependencies directly from pyproject extras
+uv pip install -e ".[dev]"
+
+# (Optional) Create/update a lockfile for the project workflow
+uv lock
+
+# Sync dependencies from pyproject + lockfile (if present)
+uv sync
+
+# Run tools inside the environment
+uv run ruff check .
+uv run ruff format .
+uv run mypy .
+uv run pytest
+```
+
+### This repository (Backend)
+
+The backend lives in `backend/` and defines `dev` extras in `backend/pyproject.toml`, so a typical setup is:
+
+```bash
+cd backend
+uv venv
+uv pip install -e ".[dev]"
+
+# Run tools without activating the venv
+uv run pytest
+uv run ruff check .
+uv run mypy .
+
+# Run the dev server
+uv run uvicorn app.main:app --reload --port 8000
+```
+
 ## Ruff Setup
 
 ### Installation

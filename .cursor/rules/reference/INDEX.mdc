@@ -94,6 +94,8 @@ alwaysApply: false
 
 ### Tools
 - **Ruff/Mypy**: `.cursor/rules/setup/python_tools.mdc`
+- **uv**: `.cursor/rules/setup/python_tools.mdc` (uv section), `.cursor/rules/reference/commands.mdc` (Python: uv + python3)
+- **python3**: `.cursor/agents/python-developer/AGENTS.md` (Tools Integration), `.cursor/rules/setup/python_tools.mdc`
 - **Security**: `.cursor/rules/setup/security.mdc` (`.cursorignore`)
 
 ## Common Workflows

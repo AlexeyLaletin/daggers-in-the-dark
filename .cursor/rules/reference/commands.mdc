@@ -12,51 +12,59 @@ alwaysApply: false
 - Setup: `.cursor/rules/setup/python_tools.mdc`
 - Workflows: `.cursor/rules/setup/validation.mdc`
 
+## Python: uv + python3 (Repository Standard)
+
+- **MUST**: Use `python3` (and `python3 -m ...`) when invoking the interpreter. Do **not** rely on `python`.
+- **SHOULD**: Prefer `uv run ...` for running Python tools (no need to activate `.venv`).
+- **SHOULD**: Use `uv` for dependency installs:
+  - If `uv.lock` exists: `uv sync --locked --dev --all-extras`
+  - If there is **no** lockfile yet: `uv venv` then `uv pip install -e ".[dev]"` (this repo uses extras `dev`)
+
 ## Code Validation Commands
 
 ### Ruff (Linting and Formatting)
 
 ```bash
 # Check code for issues
-ruff check .
+uv run ruff check .
 
 # Check specific file or directory
-ruff check path/to/file.py
-ruff check src/
+uv run ruff check path/to/file.py
+uv run ruff check src/
 
 # Auto-fix issues where possible
-ruff check --fix .
+uv run ruff check --fix .
 
 # Format code
-ruff format .
+uv run ruff format .
 
 # Format specific file
-ruff format path/to/file.py
+uv run ruff format path/to/file.py
 
 # Check and format in one command
-ruff check --fix . && ruff format .
+uv run ruff check --fix . && uv run ruff format .
 
 # Format check (fail if not formatted, for CI)
-ruff format --check .
+uv run ruff format --check .
 ```
 
 ### Mypy (Type Checking)
 
 ```bash
 # Type check all files
-mypy .
+uv run mypy .
 
 # Type check specific file
-mypy path/to/file.py
+uv run mypy path/to/file.py
 
 # Type check with specific config
-mypy --config-file mypy.ini .
+uv run mypy --config-file mypy.ini .
 
 # Type check with error codes
-mypy --show-error-codes .
+uv run mypy --show-error-codes .
 
 # Type check and show coverage
-mypy --show-error-codes --pretty .
+uv run mypy --show-error-codes --pretty .
 ```
 
 ### Pre-commit (All Hooks)
@@ -87,43 +95,43 @@ pre-commit install --hook-type commit-msg
 
 ```bash
 # Run all tests
-pytest
+uv run pytest
 
 # Run tests in specific directory
-pytest tests/
+uv run pytest tests/
 
 # Run specific test file
-pytest tests/test_module.py
+uv run pytest tests/test_module.py
 
 # Run specific test function
-pytest tests/test_module.py::test_function_name
+uv run pytest tests/test_module.py::test_function_name
 
 # Run tests matching pattern
-pytest -k "test_pattern"
+uv run pytest -k "test_pattern"
 
 # Run tests with verbose output
-pytest -v
-pytest -vv  # Extra verbose
+uv run pytest -v
+uv run pytest -vv  # Extra verbose
 
 # Run tests and show print statements
-pytest -s
+uv run pytest -s
 
 # Run tests and stop on first failure
-pytest -x
+uv run pytest -x
 
 # Run tests with coverage
-pytest --cov=src tests/
-pytest --cov=src --cov-report=html tests/
-pytest --cov=src --cov-report=xml tests/  # For CI
+uv run pytest --cov=src tests/
+uv run pytest --cov=src --cov-report=html tests/
+uv run pytest --cov=src --cov-report=xml tests/  # For CI
 
 # Run tests in parallel
-pytest -n auto
+uv run pytest -n auto
 
 # Run tests matching tags
-pytest -m "slow"        # Run tests marked as slow
-pytest -m "not slow"    # Skip slow tests
-pytest -m integration   # Run integration tests
-pytest -m e2e           # Run e2e tests
+uv run pytest -m "slow"        # Run tests marked as slow
+uv run pytest -m "not slow"    # Skip slow tests
+uv run pytest -m integration   # Run integration tests
+uv run pytest -m e2e           # Run e2e tests
 ```
 
 ## Frontend / Node.js Commands
@@ -190,30 +198,30 @@ git pull --rebase
 
 ### Complete Validation (Before Commit)
 ```bash
-ruff check --fix . && ruff format . && mypy . && pytest
+uv run ruff check --fix . && uv run ruff format . && uv run mypy . && uv run pytest
 ```
 
 ### Complete Validation (Before Push)
 ```bash
-ruff check --fix . && ruff format . && mypy . && pytest
+uv run ruff check --fix . && uv run ruff format . && uv run mypy . && uv run pytest
 ```
 
 ### CI/CD Pipeline
 ```bash
-ruff format --check .                    # Fail if not formatted
-ruff check .                             # Lint check
-mypy .                                   # Type check
-pytest --cov=src --cov-report=xml tests/ # Tests with coverage
+uv run ruff format --check .                     # Fail if not formatted
+uv run ruff check .                              # Lint check
+uv run mypy .                                    # Type check
+uv run pytest --cov=src --cov-report=xml tests/  # Tests with coverage
 ```
 
 ## Quick Reference
 
 ### Most Common Commands
 ```bash
-ruff check --fix .          # Lint and auto-fix
-ruff format .               # Format code
-mypy .                      # Type check
-pytest                      # Run all tests
+uv run ruff check --fix .   # Lint and auto-fix
+uv run ruff format .        # Format code
+uv run mypy .               # Type check
+uv run pytest               # Run all tests
 git status                  # Check status
 git commit -m "message"     # Commit changes
 ```
