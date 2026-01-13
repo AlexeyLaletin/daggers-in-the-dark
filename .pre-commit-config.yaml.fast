@@ -1,3 +1,9 @@
+# Fast pre-commit config (without tests)
+# Use this for quick commits when tests are slow
+# To use: SKIP=backend-tests,frontend-tests git commit -m "message"
+
+# Or copy this file to .pre-commit-config.yaml temporarily
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -53,22 +59,3 @@ repos:
       - id: prettier
         files: ^frontend/.*\.(ts|tsx|json|css)$
         args: [--write]
-
-  # Local hooks for running tests
-  - repo: local
-    hooks:
-      - id: backend-tests
-        name: Backend tests (pytest)
-        entry: bash -c 'cd backend && python -m pytest -x'
-        language: system
-        pass_filenames: false
-        always_run: true
-        stages: [commit]
-
-      - id: frontend-tests
-        name: Frontend tests (vitest)
-        entry: bash -c 'cd frontend && npm test -- --run'
-        language: system
-        pass_filenames: false
-        always_run: true
-        stages: [commit]
