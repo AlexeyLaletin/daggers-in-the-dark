@@ -1,0 +1,219 @@
+---
+description: Quick reference for common development commands (ruff, mypy, pytest, git)
+alwaysApply: false
+---
+# Commands Reference
+
+**Purpose:** Centralized reference for common development commands used in this repository.
+
+**When to use:** When you need to find a specific command quickly. For detailed explanations, see guides in `.cursor/rules/`.
+
+**Related:**
+- Setup: `.cursor/rules/setup/python_tools.mdc`
+- Workflows: `.cursor/rules/setup/validation.mdc`
+
+## Code Validation Commands
+
+### Ruff (Linting and Formatting)
+
+```bash
+# Check code for issues
+ruff check .
+
+# Check specific file or directory
+ruff check path/to/file.py
+ruff check src/
+
+# Auto-fix issues where possible
+ruff check --fix .
+
+# Format code
+ruff format .
+
+# Format specific file
+ruff format path/to/file.py
+
+# Check and format in one command
+ruff check --fix . && ruff format .
+
+# Format check (fail if not formatted, for CI)
+ruff format --check .
+```
+
+### Mypy (Type Checking)
+
+```bash
+# Type check all files
+mypy .
+
+# Type check specific file
+mypy path/to/file.py
+
+# Type check with specific config
+mypy --config-file mypy.ini .
+
+# Type check with error codes
+mypy --show-error-codes .
+
+# Type check and show coverage
+mypy --show-error-codes --pretty .
+```
+
+### Pre-commit (All Hooks)
+
+```bash
+# Run all pre-commit hooks on all files
+pre-commit run --all-files
+
+# Run hooks on staged files only
+pre-commit run
+
+# Run specific hook
+pre-commit run ruff --all-files
+pre-commit run mypy --all-files
+pre-commit run ruff-format --all-files
+
+# Run hooks on specific file
+pre-commit run --files path/to/file.py
+
+# Install hooks
+pre-commit install
+pre-commit install --hook-type commit-msg
+```
+
+## Testing Commands
+
+### Pytest Commands
+
+```bash
+# Run all tests
+pytest
+
+# Run tests in specific directory
+pytest tests/
+
+# Run specific test file
+pytest tests/test_module.py
+
+# Run specific test function
+pytest tests/test_module.py::test_function_name
+
+# Run tests matching pattern
+pytest -k "test_pattern"
+
+# Run tests with verbose output
+pytest -v
+pytest -vv  # Extra verbose
+
+# Run tests and show print statements
+pytest -s
+
+# Run tests and stop on first failure
+pytest -x
+
+# Run tests with coverage
+pytest --cov=src tests/
+pytest --cov=src --cov-report=html tests/
+pytest --cov=src --cov-report=xml tests/  # For CI
+
+# Run tests in parallel
+pytest -n auto
+
+# Run tests matching tags
+pytest -m "slow"        # Run tests marked as slow
+pytest -m "not slow"    # Skip slow tests
+pytest -m integration   # Run integration tests
+pytest -m e2e           # Run e2e tests
+```
+
+## Frontend / Node.js Commands
+
+### Package Managers
+```bash
+# Install dependencies
+npm ci
+npm install
+yarn install --frozen-lockfile
+pnpm install --frozen-lockfile
+```
+
+### Common Scripts
+```bash
+# Lint
+npm run lint
+
+# Format (check / write)
+npm run format:check
+npm run format
+
+# Typecheck
+npm run typecheck
+
+# Unit/component tests
+npm test
+
+# Build
+npm run build
+```
+
+## Git Version Control Commands
+
+### Status and Information
+```bash
+git status                 # Show working tree status
+git diff                   # Show changes
+git log --oneline --decorate --graph -n 20
+git branch                 # List local branches
+```
+
+### Branch Operations
+```bash
+git switch -c name         # Create and switch to branch
+git switch name            # Switch to branch
+git branch -D name         # Delete local branch (force)
+```
+
+### Committing
+```bash
+git add path/to/file
+git commit -m "message"
+git commit --amend
+```
+
+### Updating
+```bash
+git fetch --all --prune
+git pull --rebase
+```
+
+## Common Workflows
+
+### Complete Validation (Before Commit)
+```bash
+ruff check --fix . && ruff format . && mypy . && pytest
+```
+
+### Complete Validation (Before Push)
+```bash
+ruff check --fix . && ruff format . && mypy . && pytest
+```
+
+### CI/CD Pipeline
+```bash
+ruff format --check .                    # Fail if not formatted
+ruff check .                             # Lint check
+mypy .                                   # Type check
+pytest --cov=src --cov-report=xml tests/ # Tests with coverage
+```
+
+## Quick Reference
+
+### Most Common Commands
+```bash
+ruff check --fix .          # Lint and auto-fix
+ruff format .               # Format code
+mypy .                      # Type check
+pytest                      # Run all tests
+git status                  # Check status
+git commit -m "message"     # Commit changes
+```

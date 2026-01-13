@@ -1,0 +1,195 @@
+---
+description: Best practices for writing code documentation, README files, and API docs
+globs: ["**/README.md", "**/*.md", "**/docs/**"]
+alwaysApply: false
+---
+
+# Documentation Best Practices
+
+**Purpose:** Best practices for writing documentation.
+
+**When to use:** When writing code documentation, README files, or API documentation.
+
+**Related:**
+- Base rules: `.cursor/agents/base/AGENTS.md` (Documentation section)
+- LLM filtering: `.cursor/rules/practices/llm_filtering.mdc` (Comment anti-patterns)
+
+## Overview
+
+Good documentation is essential for maintainable code. This guide covers practical documentation best practices using standard Markdown and code documentation conventions.
+
+## Documentation Structure
+
+### README.md
+Every project should have a README.md with:
+
+1. **Project Title and Description**
+   - What the project does
+   - Key features
+   - Use cases
+
+2. **Getting Started**
+   - Prerequisites
+   - Installation instructions
+   - Quick start guide
+
+3. **Usage**
+   - Basic usage examples
+   - Configuration options
+   - Common workflows
+
+4. **Development**
+   - How to set up development environment
+   - How to run tests
+   - How to contribute
+
+5. **API Documentation**
+   - Link to detailed API docs
+   - Key interfaces
+   - Examples
+
+6. **Troubleshooting**
+   - Common issues and solutions
+   - FAQ
+
+### API Documentation
+
+#### Function Documentation
+```python
+def process_data(input_data: List[str], options: Dict[str, Any]) -> ProcessedData:
+    """Process input data with given options.
+
+    Args:
+        input_data: List of input strings to process. Must not be empty.
+        options: Dictionary of processing options.
+
+    Returns:
+        ProcessedData object with results and metadata.
+
+    Raises:
+        ValueError: If input_data is empty or options invalid.
+        ProcessingError: If processing fails.
+    """
+```
+
+#### Class Documentation
+```python
+class DataProcessor:
+    """Processes data according to configured rules.
+
+    Attributes:
+        mode: Current processing mode ('fast' or 'thorough').
+        threshold: Threshold value for filtering operations.
+    """
+```
+
+## Code Examples in Documentation
+
+### Good Examples
+- Show real, working code
+- Include expected output
+- Cover common use cases
+- Show error handling
+- Include edge cases when relevant
+
+### Bad Examples
+- Don't show incomplete code
+- Don't use placeholder values without explanation
+- Don't skip error handling in examples
+- Don't show deprecated APIs
+
+## Documentation Writing Guidelines
+
+### Clarity
+- Write for your audience (beginners vs experts)
+- Use clear, simple language
+- Avoid jargon when possible
+- Explain "why" not just "what"
+
+### Completeness
+- Document all public APIs
+- Include parameter descriptions
+- Document return values
+- Document exceptions/errors
+- Include examples
+
+### Accuracy
+- Keep documentation up-to-date with code
+- Review documentation during code review
+- Update docs when code changes
+- Remove outdated information
+
+### Organization
+- Use clear headings and structure
+- Group related information
+- Use tables for structured data
+- Use lists for multiple items
+- Cross-reference related topics
+
+## Code Comments
+
+**Related:** See `.cursor/rules/practices/llm_filtering.mdc` for common comment anti-patterns.
+
+### When to Comment
+- **SHOULD**: Complex algorithms or logic
+- **SHOULD**: Non-obvious design decisions
+- **SHOULD**: Workarounds for bugs or limitations
+- **MUST**: Public API documentation (docstrings)
+- **SHOULD**: TODO items with context
+
+### When NOT to Comment
+- **AVOID**: Self-explanatory code
+- **AVOID**: Comments that just restate the code
+- **AVOID**: Outdated comments
+- **AVOID**: Commented-out code (remove it)
+
+### Good Comments
+```python
+# Use binary search because the list is sorted and large (>1000 items)
+index = bisect.bisect_left(sorted_list, value)
+
+# TODO: Replace with async version when library supports it
+result = sync_operation(data)
+```
+
+### Bad Comments
+```python
+# Increment counter  # AVOID: Just restates the code
+counter += 1
+
+# This function processes data  # AVOID: Obvious from function name
+def process_data(data):
+    # Process the data  # AVOID: Redundant
+    return processed_data
+```
+
+## Architecture Documentation
+
+### System Overview
+- High-level architecture diagram
+- Component relationships
+- Data flow
+- Key design decisions
+
+### Component Documentation
+- Purpose of each component
+- Interfaces and contracts
+- Dependencies
+- Configuration options
+
+### Decision Records
+- Document significant decisions
+- Include context and alternatives
+- Explain trade-offs
+- Record when and why
+
+## Best Practices Summary
+
+1. **Write for your audience** - Consider who will read the docs
+2. **Keep it current** - Update docs with code changes
+3. **Be clear and concise** - Use simple language
+4. **Include examples** - Show, don't just tell
+5. **Document "why"** - Explain decisions, not just facts
+6. **Use proper structure** - Organize with headings and sections
+7. **Review documentation** - Include docs in code review
+8. **Remove outdated info** - Delete or update old documentation

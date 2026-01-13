@@ -1,0 +1,97 @@
+---
+description: Standard project structure templates for Python, C++, and ROS projects
+alwaysApply: false
+---
+# Project Structure Templates
+
+**Purpose:** Standard project structure templates for different project types.
+
+**When to use:** When starting a new project or organizing existing code.
+
+**Related:**
+- Python: `.cursor/agents/python-developer/AGENTS.md`
+- C++: `.cursor/agents/cpp-developer/AGENTS.md`
+
+## Python Project
+
+```
+project/
+├── src/
+│   └── module_name/
+│       ├── __init__.py
+│       ├── main.py
+│       └── utils.py
+├── tests/
+│   ├── __init__.py
+│   ├── test_module_name.py
+│   ├── test_integration.py
+│   └── fixtures/
+│       └── test_data.json
+├── pyproject.toml
+├── .ruff.toml
+├── mypy.ini
+├── .pre-commit-config.yaml
+└── README.md
+```
+
+## C++ Project
+
+```
+project/
+├── include/
+│   └── project/
+│       └── module.h
+├── src/
+│   └── module.cpp
+├── tests/
+│   └── test_module.cpp
+├── CMakeLists.txt
+└── README.md
+```
+
+## ROS Project
+
+```
+ros_package/
+├── CMakeLists.txt
+├── package.xml
+├── msg/
+│   └── CustomMessage.msg
+├── srv/
+│   └── CustomService.srv
+├── src/
+│   └── node_name.cpp
+├── scripts/
+│   └── node_name.py
+├── launch/
+│   └── node_name.launch
+└── test/
+    └── test_node.cpp
+```
+
+## Mixed Python/C++ Project
+
+```
+project/
+├── include/
+│   └── project/
+│       └── cpp_module.h
+├── src/
+│   ├── cpp_module.cpp
+│   └── python_module/
+│       ├── __init__.py
+│       └── main.py
+├── tests/
+│   ├── test_cpp_module.cpp
+│   └── test_python_module.py
+├── CMakeLists.txt
+└── pyproject.toml
+```
+
+## General Principles
+
+1. **Separate source and tests** - Keep test code separate from production code
+2. **Organize by feature** - Group related files together
+3. **Use clear naming** - Follow naming conventions (snake_case for files/dirs)
+4. **Include configuration files** - Place config files at project root
+5. **Document structure** - Include README.md explaining project layout

@@ -1,0 +1,234 @@
+---
+description: Test-Driven Development workflow and practices for writing tests first
+globs: ["**/test_*.py", "**/*_test.py", "**/*_test.cpp", "**/test_*.cpp", "**/tests/**"]
+alwaysApply: false
+---
+
+# Test-Driven Development (TDD) Best Practices
+
+**Purpose:** TDD workflow and practices for writing tests before implementation.
+
+**When to use:** When practicing TDD or learning test-driven development approach.
+
+**Related:**
+- General testing principles: `.cursor/agents/shared-patterns/AGENTS.md` (Testing Principles)
+- QA guidelines: `.cursor/agents/qa-engineer/AGENTS.md`
+- Commands: `.cursor/rules/reference/commands.mdc`
+
+## Overview
+
+Test-Driven Development (TDD) is a software development approach where tests are written before the implementation code.
+
+## TDD Cycle: Red-Green-Refactor
+
+### 1. Red - Write a Failing Test
+- Write a test for the functionality you want
+- The test should fail (because code doesn't exist yet)
+- This defines the desired behavior
+
+### 2. Green - Make the Test Pass
+- Write the minimum code needed to pass the test
+- Don't worry about perfect code yet
+- Just make it work
+
+### 3. Refactor - Improve the Code
+- Improve code quality while keeping tests green
+- Remove duplication
+- Improve readability
+- Optimize if needed
+
+## TDD Workflow Example
+
+### Step 1: Write Failing Test
+```python
+def test_add_numbers():
+    """Test adding two numbers."""
+    result = add(2, 3)
+    assert result == 5
+```
+
+### Step 2: Implement Minimum Code
+```python
+def add(a, b):
+    """Add two numbers."""
+    return 5  # Minimum to pass test
+```
+
+### Step 3: Add More Tests & Refactor
+Add tests for edge cases, then refactor implementation to handle all cases properly.
+
+## Test Organization
+
+### Test Structure
+```
+project/
+├── src/
+│   └── module.py
+└── tests/
+    ├── __init__.py
+    ├── test_module.py
+    ├── test_integration.py
+    └── fixtures/
+        └── test_data.json
+```
+
+### Test Naming
+- Use descriptive names: `test_function_name_should_do_something_when_condition`
+- Group related tests in classes
+- Use fixtures for common setup
+
+### Example Test Organization
+```python
+import pytest
+from src.module import DataProcessor
+
+class TestDataProcessor:
+    """Tests for DataProcessor class."""
+
+    def test_process_empty_list_returns_empty(self):
+        """Test processing empty list returns empty result."""
+        processor = DataProcessor()
+        result = processor.process([])
+        assert result == []
+
+    def test_process_invalid_data_raises_error(self):
+        """Test processing invalid data raises ValueError."""
+        processor = DataProcessor()
+        with pytest.raises(ValueError):
+            processor.process(None)
+```
+
+## Test Types
+
+### Unit Tests
+- Test individual functions/methods in isolation
+- Fast execution (<1 second each)
+- Mock external dependencies
+- Test behavior, not implementation
+
+### Integration Tests
+- Test component interactions
+- Use real dependencies when possible
+- Test data flows
+- Slower than unit tests
+
+### End-to-End Tests
+- Test complete user workflows
+- Use production-like environment
+- Test critical paths only (they're slow)
+- Minimal e2e tests
+
+See `.cursor/agents/shared-patterns/AGENTS.md` for detailed test type guidelines.
+
+## Mocking Strategies
+
+### When to Mock
+- External services (APIs, databases)
+- Slow operations (file I/O, network)
+- Non-deterministic behavior (random, time)
+- Expensive operations
+
+### When NOT to Mock
+- Simple data transformations
+- Business logic
+- Fast operations
+- When real behavior is needed
+
+### Mocking Example
+```python
+from unittest.mock import Mock
+
+def test_process_with_external_service():
+    """Test processing with mocked external service."""
+    mock_service = Mock()
+    mock_service.fetch_data.return_value = ["data1", "data2"]
+    processor = DataProcessor(service=mock_service)
+    result = processor.process()
+    assert len(result) == 2
+    mock_service.fetch_data.assert_called_once()
+```
+
+## TDD Best Practices
+
+### 1. Start Small
+- Write the simplest test first
+- Add complexity gradually
+- One test at a time
+
+### 2. Test Behavior, Not Implementation
+- Test what the code does, not how
+- Don't test private methods directly
+- Focus on public interface
+
+### 3. Keep Tests Fast
+- Unit tests should be very fast
+- Use mocks for slow operations
+- Run tests frequently
+
+### 4. Keep Tests Independent
+- Tests should not depend on each other
+- No test order dependencies
+- Each test should be runnable alone
+
+### 5. Use Descriptive Names
+- Test names should describe what is tested
+- Include expected behavior
+- Include conditions when relevant
+
+### 6. One Assertion Per Test (When Possible)
+- Focus on one thing per test
+- Easier to understand failures
+- Can have multiple related assertions
+
+### 7. Test Edge Cases
+- Test boundary conditions
+- Test error cases
+- Test empty/null inputs
+- Test invalid inputs
+
+## Common TDD Patterns
+
+### Arrange-Act-Assert (AAA)
+```python
+def test_example():
+    # Arrange - Set up test data
+    input_data = [1, 2, 3]
+    processor = DataProcessor()
+    # Act - Execute the code
+    result = processor.process(input_data)
+    # Assert - Verify the result
+    assert result == [2, 4, 6]
+```
+
+### Test Fixtures and Parametrization
+Use `@pytest.fixture` for reusable test data and `@pytest.mark.parametrize` for testing multiple cases.
+
+## TDD for Bug Fixes
+
+### Reproduce Bug in Test
+1. Write a test that reproduces the bug
+2. Test should fail (showing the bug)
+3. Fix the code
+4. Test should pass (bug is fixed)
+5. Add regression test to prevent recurrence
+
+## Integration with Development Tools
+
+**Related:** See `.cursor/rules/reference/commands.mdc` for all testing commands.
+
+### Test Coverage
+- **SHOULD**: Aim for meaningful coverage, not just percentage
+- **MUST**: Cover critical paths
+- **MUST**: Cover error cases
+- **AVOID**: Obsessing over 100% coverage
+
+## Best Practices Summary
+
+1. **Red-Green-Refactor** - Follow the TDD cycle
+2. **Start Small** - Write simplest test first
+3. **Test Behavior** - Test what, not how
+4. **Keep Tests Fast** - Use mocks for slow operations
+5. **Keep Tests Independent** - No dependencies between tests
+6. **Test Edge Cases** - Boundary conditions and errors
+7. **Use Descriptive Names** - Clear test names
+8. **Refactor Regularly** - Improve code while keeping tests green

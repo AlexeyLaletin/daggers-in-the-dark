@@ -1,0 +1,92 @@
+---
+description: Best practices for frontend development (TypeScript/JavaScript, UI architecture, performance, accessibility, testing)
+globs:
+  - "**/*.{ts,tsx,js,jsx}"
+  - "**/*.{css,scss,sass,less}"
+  - "**/*.{md,mdx}"
+alwaysApply: false
+applyIntelligently: true
+---
+
+# Frontend Best Practices
+
+**Purpose:** Provide practical, vendor-neutral guidance for building maintainable frontend applications.
+
+**When to use:** When designing UI architecture, reviewing frontend PRs, or fixing UI bugs/perf issues.
+
+**Related:**
+- Frontend agent: `.cursor/agents/frontend-developer/AGENTS.md`
+- Validation: `.cursor/rules/setup/validation.mdc`
+- LLM filtering: `.cursor/rules/practices/llm_filtering.mdc`
+
+## TypeScript / JavaScript Practices
+
+### Type safety
+- **MUST**: Avoid `any` in app code. Prefer `unknown` + type guards.
+- **SHOULD**: Use discriminated unions for state machines and API results.
+- **SHOULD**: Keep runtime validation at boundaries (API responses, `localStorage`, URL params).
+- **AVOID**: Over-typing (types that mirror implementation details and become brittle).
+
+### Module design
+- **SHOULD**: Prefer “feature folders” (UI + logic + tests) over “type folders”.
+- **MUST**: Keep side effects out of shared modules (no hidden timers, network calls on import).
+- **SHOULD**: Make data flow explicit: inputs/outputs > ambient global state.
+
+## UI Architecture
+
+### Suggested layering (adapt to repo)
+- **UI layer**: components, styles, view models
+- **Domain layer**: business rules, transformations, state machines
+- **Data layer**: API client, caching, persistence
+
+### Component guidelines
+- **SHOULD**: Components should be easy to use correctly and hard to use incorrectly.
+- **SHOULD**: Prefer controlled inputs and explicit props.
+- **AVOID**: Prop drilling “forever” — but also avoid introducing global state too early.
+
+## Performance
+
+### Common pitfalls
+- Unstable callbacks/objects passed to children
+- Expensive computations on every render
+- Rendering large lists without virtualization
+- Shipping large bundles with no splitting
+
+### Practical guidance
+- **MUST**: Profile before major optimizations.
+- **SHOULD**: Use memoization for expensive work, not everywhere by default.
+- **SHOULD**: Code split at route/page boundaries; lazy-load non-critical widgets.
+- **SHOULD**: Avoid layout shift (reserve space, use proper image sizing).
+
+## Accessibility (a11y)
+
+- **MUST**: Keyboard support for all interactive UI.
+- **MUST**: Use semantic HTML elements (`button`, `a`, `label`, `fieldset`, etc.).
+- **SHOULD**: Validate with automated checks (ESLint a11y rules, Testing Library queries).
+- **SHOULD**: Treat a11y bugs as correctness bugs, not polish.
+
+## Error Handling & UX
+
+- **MUST**: Provide clear empty/loading/error states.
+- **SHOULD**: Prefer user-actionable error messages (“Try again”, “Check connection”).
+- **AVOID**: Swallowing errors silently; log with context (without leaking sensitive data).
+
+## Testing Strategy
+
+### What to test
+- **Unit tests**: pure functions, reducers, validators, formatting
+- **Component tests**: user-visible behavior (clicks, typing, navigation)
+- **E2E tests**: critical flows, happy paths + one key failure path
+
+### Testing guidelines
+- **MUST**: Test behavior, not implementation details.
+- **SHOULD**: Prefer queries that match how users find elements (role/name).
+- **SHOULD**: Avoid brittle snapshot tests for complex UI; use targeted assertions.
+
+## PR Review Checklist (Frontend)
+
+- [ ] No new `any` (or justified with clear comment)
+- [ ] Loading/error states covered for async flows
+- [ ] Keyboard navigation works for new UI
+- [ ] No obvious perf regressions (big lists, expensive renders, large bundles)
+- [ ] Tests added/updated and are stable

@@ -1,0 +1,92 @@
+---
+description: Security setup and .cursorignore configuration to exclude sensitive data
+alwaysApply: false
+applyIntelligently: true
+---
+# Security Setup Guide
+
+**Purpose:** Security configuration for Cursor IDE to prevent exposing sensitive data.
+
+**When to use:** When setting up Cursor for a new project or reviewing security settings.
+
+**Related:**
+- Base rules: `.cursor/agents/base/AGENTS.md` (Security section)
+- Project structure: `.cursor/rules/reference/project_structure.mdc`
+
+## Overview
+
+Cursor IDE indexes files in your workspace to provide context to LLM. To prevent exposing sensitive information (secrets, tokens, credentials), use `.cursorignore` file.
+
+## .cursorignore File
+
+The `.cursorignore` file works similarly to `.gitignore` - it tells Cursor which files and directories to exclude from indexing and context.
+
+### Default Configuration
+
+Create `.cursorignore` in your project root with:
+
+```
+# Секреты и конфиденциальные данные
+*.pem
+.env.*
+
+# Токены и креды
+**/token*
+**/credentials*
+**/secret*
+
+# Конфиги с чувствительными данными
+config/production/
+config/secrets/
+
+# Внутренние данные компании
+# (добавьте специфичные для вашего проекта пути)
+```
+
+### Customizing .cursorignore
+
+Add project-specific paths and patterns:
+
+```
+# Project-specific secrets
+**/local_config/
+**/private_keys/
+
+# Database credentials
+**/db_config.*
+**/database.ini
+
+# API keys
+**/api_keys.*
+**/keys.json
+```
+
+## Best Practices
+
+1. **MUST**: Create `.cursorignore` at project root
+2. **MUST**: Exclude all files containing secrets, tokens, or credentials
+3. **SHOULD**: Review `.cursorignore` regularly
+4. **SHOULD**: Add project-specific sensitive paths
+5. **MUST**: Never commit secrets even if they're in `.cursorignore`
+
+## Common Patterns to Exclude
+
+- Environment files: `.env*`, `.env.local`, `.env.production`
+- Certificate files: `*.pem`, `*.key`, `*.crt`, `*.p12`
+- Credential files: `*credentials*`, `*secrets*`, `*token*`
+- Configuration with secrets: `config/production/`, `config/secrets/`
+- Private keys: `**/private_keys/`, `**/keys/`
+
+## Verification
+
+To verify files are excluded:
+1. Check Cursor settings for indexed files
+2. Review what files Cursor has access to
+3. Ensure sensitive files are not in context
+
+## Important Notes
+
+- `.cursorignore` only affects Cursor IDE, not git
+- Still use `.gitignore` for git exclusions
+- Never rely solely on `.cursorignore` for security
+- Always follow security best practices for handling secrets

@@ -1,0 +1,289 @@
+---
+description: Filter problematic LLM-generated code patterns during code review
+alwaysApply: false
+applyIntelligently: true
+---
+# LLM Code Problem Filtering
+
+**Purpose:** Identify and filter out common problematic patterns in LLM-generated code.
+
+**When to use:** During code review of LLM-generated code or when reviewing your own LLM-assisted code.
+
+**Related:**
+- Documentation guidelines: `.cursor/rules/practices/documentation.mdc`
+- Base rules: `.cursor/agents/base/AGENTS.md`
+
+## Overview
+
+When working with LLM-generated code, there are common patterns and problems to watch for. This guide helps identify and filter out problematic LLM-generated code patterns.
+
+## Common LLM Code Problems
+
+### 1. Useless Comments
+
+**Related:** See `.cursor/rules/practices/documentation.mdc` for comment guidelines.
+
+#### Problem Pattern
+```python
+# This function adds two numbers together  # AVOID: Restates function name
+def add(a, b):
+    # Return the sum of a and b  # AVOID: Restates return statement
+    return a + b
+```
+
+#### Good Alternative
+```python
+def add(a: int, b: int) -> int:
+    """Add two numbers."""  # Use docstring instead
+    return a + b
+```
+
+#### Filtering Rules
+- **MUST**: Remove comments that just restate the code
+- **SHOULD**: Keep comments that explain "why" not "what"
+- **MUST**: Use docstrings for function documentation
+- **MUST**: Remove obvious comments like "# increment counter" before `counter += 1`
+
+### 2. Overly Verbose Variable Names
+
+#### Problem Pattern
+```python
+def process_user_data(user_data_input_parameter):
+    processed_user_data_output = []
+    for individual_user_data_item in user_data_input_parameter:
+        processed_individual_user_data_item = transform(individual_user_data_item)
+        processed_user_data_output.append(processed_individual_user_data_item)
+    return processed_user_data_output
+```
+
+#### Good Alternative
+```python
+def process_user_data(users: List[User]) -> List[ProcessedUser]:
+    """Process list of users."""
+    return [transform(user) for user in users]
+```
+
+#### Filtering Rules
+- Use concise but clear names
+- Avoid redundant words (e.g., `user_data` not `user_data_input_parameter`)
+- Use type hints instead of verbose names
+- Prefer list comprehensions for simple transformations
+
+### 3. Unnecessary Abstractions
+
+#### Problem Pattern
+```python
+class DataProcessorFactory:
+    """Factory for creating data processors."""
+
+    @staticmethod
+    def create_processor():
+        """Create a data processor."""
+        return DataProcessor()
+
+class DataProcessor:
+    """Processes data."""
+
+    def process(self, data):
+        """Process data."""
+        return [x * 2 for x in data]
+
+# Usage
+factory = DataProcessorFactory()
+processor = factory.create_processor()
+result = processor.process([1, 2, 3])
+```
+
+#### Good Alternative
+```python
+def process_data(data: List[int]) -> List[int]:
+    """Process data by doubling each value."""
+    return [x * 2 for x in data]
+
+# Usage
+result = process_data([1, 2, 3])
+```
+
+#### Filtering Rules
+- Don't create abstractions before you need them
+- Prefer simple functions over classes when possible
+- Avoid factory pattern for simple cases
+- YAGNI (You Aren't Gonna Need It)
+
+### 4. Template Code That Doesn't Fit
+
+#### Problem Pattern
+```python
+def get_user(user_id):
+    """Get user by ID."""
+    try:
+        # Generic error handling that doesn't fit
+        user = database.get_user(user_id)
+        if user is None:
+            raise ValueError("User not found")
+        return user
+    except Exception as e:
+        # Generic exception handling
+        logger.error(f"Error: {e}")
+        raise
+```
+
+#### Good Alternative
+```python
+def get_user(user_id: int) -> User:
+    """Get user by ID.
+
+    Raises:
+        UserNotFoundError: If user doesn't exist.
+        DatabaseError: If database operation fails.
+    """
+    user = database.get_user(user_id)
+    if user is None:
+        raise UserNotFoundError(f"User {user_id} not found")
+    return user
+```
+
+#### Filtering Rules
+- Adapt code to project's error handling patterns
+- Use project-specific exception types
+- Match existing code style
+- Remove generic template code
+
+### 5. Missing Error Handling
+
+#### Problem Pattern
+```python
+def process_file(filename):
+    """Process file."""
+    with open(filename) as f:
+        data = f.read()
+    return process(data)
+```
+
+#### Good Alternative
+```python
+def process_file(filename: str) -> ProcessedData:
+    """Process file.
+
+    Raises:
+        FileNotFoundError: If file doesn't exist.
+        PermissionError: If file cannot be read.
+    """
+    try:
+        with open(filename) as f:
+            data = f.read()
+        return process(data)
+    except FileNotFoundError:
+        raise
+    except Exception as e:
+        raise ProcessingError(f"Failed to process {filename}") from e
+```
+
+#### Filtering Rules
+- Add appropriate error handling
+- Use specific exception types
+- Handle expected errors
+- Don't catch-all without good reason
+
+### 6. Inconsistent Style
+
+#### Problem Pattern
+```python
+# Mixing styles in same file
+def getData():  # camelCase
+    pass
+
+def process_data():  # snake_case
+    pass
+
+class DataProcessor:  # PascalCase
+    def GetValue(self):  # camelCase method
+        pass
+```
+
+#### Good Alternative
+```python
+# Consistent style
+def get_data() -> Data:
+    """Get data."""
+    pass
+
+def process_data(data: Data) -> ProcessedData:
+    """Process data."""
+    pass
+
+class DataProcessor:
+    """Process data."""
+
+    def get_value(self) -> Value:
+        """Get value."""
+        pass
+```
+
+#### Filtering Rules
+- Match existing codebase style
+- Follow project conventions
+- Use consistent naming
+- Check style guide
+
+## Code Review Checklist for LLM Code
+
+### Comments
+- [ ] No useless comments that restate code
+- [ ] Comments explain "why" not "what"
+- [ ] Docstrings for public APIs
+- [ ] No commented-out code
+
+### Naming
+- [ ] Variable names are concise but clear
+- [ ] No overly verbose names
+- [ ] Consistent with codebase style
+- [ ] Type hints used instead of verbose names
+
+### Structure
+- [ ] No unnecessary abstractions
+- [ ] Code fits project patterns
+- [ ] No template code that doesn't fit
+- [ ] Matches existing code style
+
+### Error Handling
+- [ ] Appropriate error handling present
+- [ ] Specific exception types used
+- [ ] Errors handled at right level
+- [ ] Error messages are helpful
+
+### Code Quality
+- [ ] Code is readable and maintainable
+- [ ] No obvious bugs
+- [ ] Follows best practices
+- [ ] Tests are included
+
+## Filtering Templates
+
+### Key Patterns to Remove
+1. **Useless comments** - Remove comments that restate code
+2. **Verbose names** - Simplify overly descriptive variable names
+3. **Unnecessary classes** - Prefer functions over classes for simple operations
+4. **Template code** - Adapt generic templates to project style
+5. **Missing error handling** - Add appropriate error handling
+
+## Best Practices
+
+1. **Review LLM code carefully** - Don't accept blindly
+2. **Remove useless comments** - Code should be self-documenting
+3. **Simplify verbose code** - Use concise but clear names
+4. **Match project style** - Adapt to existing codebase
+5. **Add error handling** - Don't assume everything works
+6. **Test the code** - Verify it actually works
+7. **Refactor as needed** - Improve code quality
+
+## Common Red Flags
+
+- Excessive comments explaining obvious code
+- Variable names with redundant words
+- Unnecessary class hierarchies
+- Generic error handling that doesn't fit
+- Template code that doesn't match project style
+- Missing error handling
+- Inconsistent naming conventions
+- Over-engineered solutions

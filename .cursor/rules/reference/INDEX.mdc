@@ -1,0 +1,125 @@
+---
+description: Navigation map for all Cursor configuration documentation and quick search
+alwaysApply: false
+---
+# Documentation Index
+
+**Purpose:** Navigation map for all Cursor configuration documentation.
+
+**When to use:** Start here to find information quickly. Use search (Ctrl+F) to find specific topics.
+
+## Quick Navigation
+
+### By Role
+- **Python Developer**: `.cursor/agents/python-developer/AGENTS.md` → `.cursor/rules/setup/python_tools.mdc`
+- **Frontend Developer**: `.cursor/agents/frontend-developer/AGENTS.md` → `.cursor/rules/setup/frontend_tools.mdc`
+- **C++ Developer**: `.cursor/agents/cpp-developer/AGENTS.md`
+- **System Architect**: `.cursor/agents/system-architect/AGENTS.md`
+- **QA Engineer**: `.cursor/agents/qa-engineer/AGENTS.md` → `.cursor/rules/practices/tdd.mdc`
+
+### By Task
+
+#### Setting Up Development Environment
+1. Choose role-specific agent: `.cursor/agents/[role]/AGENTS.md`
+2. Set up tools: `.cursor/rules/setup/python_tools.mdc`
+3. Configure validation: `.cursor/rules/setup/validation.mdc`
+4. Configure security: `.cursor/rules/setup/security.mdc`
+
+#### Writing Code
+1. Base rules: `.cursor/agents/base/AGENTS.md`
+2. Shared patterns: `.cursor/agents/shared-patterns/AGENTS.md`
+3. Role-specific rules: `.cursor/agents/[role]/AGENTS.md`
+
+#### Running Commands
+- All commands: `.cursor/rules/reference/commands.mdc`
+
+#### Testing
+1. General principles: `.cursor/agents/shared-patterns/AGENTS.md` (Testing section)
+2. TDD practices: `.cursor/rules/practices/tdd.mdc`
+3. QA guidelines: `.cursor/agents/qa-engineer/AGENTS.md`
+4. Commands: `.cursor/rules/reference/commands.mdc` (Testing section)
+
+#### Documentation
+1. Best practices: `.cursor/rules/practices/documentation.mdc`
+2. Code comments: `.cursor/agents/base/AGENTS.md` + `.cursor/rules/practices/documentation.mdc`
+
+#### Code Review
+1. LLM filtering: `.cursor/rules/practices/llm_filtering.mdc`
+2. Base rules: `.cursor/agents/base/AGENTS.md`
+
+## File Structure
+
+### Agents (`.cursor/agents/`)
+- `base/AGENTS.md` - General engineering rules
+- `shared-patterns/AGENTS.md` - Common patterns and anti-patterns
+- `python-developer/AGENTS.md` - Python-specific rules
+- `frontend-developer/AGENTS.md` - Frontend (web) engineering rules
+- `cpp-developer/AGENTS.md` - C++-specific rules
+- `system-architect/AGENTS.md` - System architecture rules
+- `qa-engineer/AGENTS.md` - QA and testing rules
+
+### Reference (`.cursor/rules/reference/`)
+- `INDEX.mdc` - This file (navigation)
+- `commands.mdc` - All commands reference
+- `project_structure.mdc` - Project structure templates
+
+### Practices (`.cursor/rules/practices/`)
+- `documentation.mdc` - Documentation best practices
+- `frontend_best_practices.mdc` - Frontend best practices (TS/JS, UI architecture, perf, a11y, testing)
+- `tdd.mdc` - Test-driven development
+- `llm_filtering.mdc` - LLM code problem filtering
+
+### Setup (`.cursor/rules/setup/`)
+- `python_tools.mdc` - Ruff, Mypy, pre-commit setup
+- `frontend_tools.mdc` - Node/ESLint/Prettier/TypeScript/testing setup
+- `validation.mdc` - Validation workflows
+- `security.mdc` - Security setup and `.cursorignore` configuration
+
+## Search by Keyword
+
+### Commands
+- **ruff**: `.cursor/rules/reference/commands.mdc`, `.cursor/rules/setup/python_tools.mdc`
+- **mypy**: `.cursor/rules/reference/commands.mdc`, `.cursor/rules/setup/python_tools.mdc`
+- **pytest**: `.cursor/rules/reference/commands.mdc`, `.cursor/agents/qa-engineer/AGENTS.md`
+ - **eslint/prettier/typescript**: `.cursor/rules/setup/frontend_tools.mdc`
+
+### Concepts
+- **Testing**: `.cursor/agents/shared-patterns/AGENTS.md`, `.cursor/agents/qa-engineer/AGENTS.md`, `.cursor/rules/practices/tdd.mdc`
+- **Error Handling**: `.cursor/agents/shared-patterns/AGENTS.md`, `.cursor/agents/python-developer/AGENTS.md`, `.cursor/agents/cpp-developer/AGENTS.md`
+- **Documentation**: `.cursor/agents/base/AGENTS.md`, `.cursor/rules/practices/documentation.mdc`
+- **Project Structure**: `.cursor/rules/reference/project_structure.mdc`
+- **Code Style**: `.cursor/agents/[role]/AGENTS.md`
+ - **Frontend**: `.cursor/agents/frontend-developer/AGENTS.md`, `.cursor/rules/practices/frontend_best_practices.mdc`
+
+### Tools
+- **Ruff/Mypy**: `.cursor/rules/setup/python_tools.mdc`
+- **Security**: `.cursor/rules/setup/security.mdc` (`.cursorignore`)
+
+## Common Workflows
+
+### Starting a New Python Project
+1. Read: `.cursor/agents/python-developer/AGENTS.md`
+2. Check structure: `.cursor/rules/reference/project_structure.mdc`
+3. Setup tools: `.cursor/rules/setup/python_tools.mdc`
+
+### Starting a New C++ Project
+1. Read: `.cursor/agents/cpp-developer/AGENTS.md`
+2. Check structure: `.cursor/rules/reference/project_structure.mdc`
+
+### Code Review Checklist
+1. Base rules: `.cursor/agents/base/AGENTS.md`
+2. LLM filtering: `.cursor/rules/practices/llm_filtering.mdc`
+3. Role-specific: `.cursor/agents/[role]/AGENTS.md`
+
+### Before Committing
+1. Commands: `.cursor/rules/reference/commands.mdc` (Common Workflows)
+2. Validation: `.cursor/rules/setup/validation.mdc`
+
+## Getting Help
+
+- **Can't find a command?** → `.cursor/rules/reference/commands.mdc`
+- **Need project structure?** → `.cursor/rules/reference/project_structure.mdc`
+- **Setting up tools?** → `.cursor/rules/setup/`
+- **Writing tests?** → `.cursor/agents/qa-engineer/AGENTS.md`, `.cursor/rules/practices/tdd.mdc`
+- **Code style questions?** → `.cursor/agents/[role]/AGENTS.md`
+- **Best practices?** → `.cursor/rules/practices/`

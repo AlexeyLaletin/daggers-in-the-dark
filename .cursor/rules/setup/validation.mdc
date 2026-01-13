@@ -1,0 +1,93 @@
+---
+description: Validation workflows for code quality checks and testing before commit/push
+alwaysApply: false
+applyIntelligently: true
+---
+# Validation and Testing Workflows
+
+**Purpose:** Workflows for validating code and running tests.
+
+**When to use:** When setting up validation workflows or understanding when to run validation.
+
+**Related:**
+- All commands: `.cursor/rules/reference/commands.mdc`
+- Python tools setup: `.cursor/rules/setup/python_tools.mdc`
+- Testing principles: `.cursor/agents/shared-patterns/AGENTS.md`
+
+## Overview
+
+This guide provides workflows for validating code and running tests. For specific commands, see `.cursor/rules/reference/commands.mdc`.
+
+## Validation Workflows
+
+### Before Committing
+
+**MUST** run validation before committing:
+1. Format code (ruff format)
+2. Lint and auto-fix (ruff check --fix)
+3. Type check (mypy)
+4. Run tests (pytest)
+5. Run pre-commit hooks (if configured)
+
+See `.cursor/rules/reference/commands.mdc` for exact commands.
+
+### Before Pushing
+
+**MUST** run full validation before pushing:
+1. Complete validation (ruff, mypy, pytest)
+2. Run the repo’s full test suite (unit + integration as applicable)
+3. Check pre-commit hooks (if configured)
+
+See `.cursor/rules/reference/commands.mdc` for exact commands.
+
+### CI/CD Pipeline
+
+**SHOULD** configure CI/CD to run:
+1. Format check (fail if not formatted)
+2. Lint check
+3. Type check
+4. Tests with coverage
+5. Coverage threshold check (if used by the repo)
+
+See `.cursor/rules/reference/commands.mdc` for CI/CD commands.
+
+## Best Practices
+
+1. **MUST**: Run validation before committing
+2. **SHOULD**: Use pre-commit hooks to automate validation
+3. **MUST**: Run tests frequently - don't accumulate failures
+4. **SHOULD**: Check coverage - aim for meaningful coverage
+5. **MUST**: Fix issues promptly - don't ignore warnings
+6. **SHOULD**: Use CI/CD - automate validation in pipeline
+
+## Best Practices
+
+1. **Run validation before committing** - Catch issues early
+2. **Use pre-commit hooks** - Automate validation
+3. **Run tests frequently** - Don't accumulate failures
+4. **Check coverage** - Aim for meaningful coverage
+5. **Fix issues promptly** - Don't ignore warnings
+6. **Use CI/CD** - Automate validation in pipeline
+
+## Troubleshooting
+
+### Ruff Fails
+- Check `.ruff.toml` configuration
+- Verify rule names are correct
+- Review ignored rules
+
+### Mypy Fails
+- Check `mypy.ini` configuration
+- Verify type stubs are available
+- Review type annotations
+
+### Tests Fail
+- Run tests individually to isolate issues
+- Check test data and fixtures
+- Review test environment setup
+- Verify dependencies are installed
+
+### Repo-Specific Tests Fail
+- Check build/test configuration (e.g. `pyproject.toml`, `tox.ini`, `CMakeLists.txt`, CI workflow files)
+- Run the failing suite locally with verbose output
+- Verify test data/fixtures are available

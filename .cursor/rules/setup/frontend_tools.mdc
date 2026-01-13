@@ -1,0 +1,72 @@
+---
+description: Setup frontend development tools (Node package manager, ESLint, Prettier, TypeScript, tests)
+alwaysApply: false
+applyIntelligently: true
+---
+
+# Frontend Tools Setup Guide
+
+**Purpose:** Vendor-neutral guidance for configuring common frontend tooling.
+
+**When to use:** When setting up or standardizing linting/formatting/typechecking/testing in a frontend project.
+
+**Related:**
+- Frontend best practices: `.cursor/rules/practices/frontend_best_practices.mdc`
+- Validation workflows: `.cursor/rules/setup/validation.mdc`
+
+## Package Manager
+
+- **MUST**: Use the repository’s standard package manager (`npm`, `yarn`, or `pnpm`).
+- **MUST**: Commit the lockfile (`package-lock.json`, `yarn.lock`, or `pnpm-lock.yaml`).
+- **SHOULD**: Pin Node version (e.g. via `.nvmrc`, `.node-version`, or `engines` in `package.json`).
+
+## ESLint
+
+- **MUST**: Enable ESLint for JS/TS.
+- **SHOULD**: Add rules for unsafe patterns:
+  - No unused vars/imports
+  - No floating promises (TS)
+  - Exhaustive deps for hooks (React)
+- **SHOULD**: Prefer warnings locally but fail CI on errors.
+
+## Prettier (Formatting)
+
+- **MUST**: Use Prettier (or an equivalent formatter) consistently.
+- **MUST**: Avoid formatting wars: format-on-save + CI `--check`.
+- **SHOULD**: Keep formatting config in repo root and apply to all packages.
+
+## TypeScript
+
+- **MUST**: Use `strict` mode for new codebases when feasible.
+- **SHOULD**: Prefer `noUncheckedIndexedAccess` for data-heavy apps.
+- **SHOULD**: Use path aliases sparingly; keep imports understandable.
+- **MUST**: Typecheck in CI.
+
+## Testing
+
+### Unit / component tests
+- Common choices: Vitest/Jest + Testing Library.
+- **MUST**: Make tests deterministic (mock time/network, avoid real randomness).
+- **SHOULD**: Keep component tests focused on behavior (role/name assertions).
+
+### E2E tests
+- Common choices: Playwright or Cypress.
+- **SHOULD**: Run a small smoke suite on every PR; run full suite on schedule.
+
+## Suggested `package.json` scripts (example)
+
+These names are intentionally generic; adapt to the repo:
+
+- `lint`: run ESLint
+- `format`: run Prettier write
+- `format:check`: run Prettier check
+- `typecheck`: run TypeScript (`tsc -p tsconfig.json --noEmit`)
+- `test`: unit/component tests
+- `test:e2e`: e2e tests
+- `build`: production build
+
+## CI baseline
+
+- **MUST**: `lint` + `typecheck` + `test` on every PR.
+- **SHOULD**: `format:check` on every PR.
+- **SHOULD**: `build` on every PR for apps (catches bundler/runtime issues).
