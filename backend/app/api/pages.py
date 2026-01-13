@@ -10,6 +10,7 @@ from sqlmodel import Session, select
 from app.db import get_session
 from app.models import NotePage
 from app.schemas import NotePageCreate, NotePageResponse, NotePageUpdate
+from app.services.graph import rebuild_wikilinks_for_page
 
 router = APIRouter(prefix="/pages", tags=["pages"])
 
@@ -86,6 +87,11 @@ async def update_page(
     session.add(page)
     session.commit()
     session.refresh(page)
+
+    # Rebuild wikilinks if body_markdown was updated
+    if "body_markdown" in update_data:
+        rebuild_wikilinks_for_page(session, page.id)
+
     return page
 
 
