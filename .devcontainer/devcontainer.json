@@ -1,0 +1,34 @@
+{
+  "name": "daggers-in-the-dark (dev)",
+  "dockerComposeFile": [
+    "compose.yml"
+  ],
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "overrideCommand": false,
+  "updateRemoteUserUID": true,
+  "remoteUser": "vscode",
+  "forwardPorts": [
+    3000,
+    5173,
+    8000,
+    5432,
+    6379
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "editorconfig.editorconfig",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-python.python"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "postCreateCommand": "bash -lc 'if [ -f package.json ]; then corepack enable || true; fi; echo \"Dev container ready.\"'"
+}
