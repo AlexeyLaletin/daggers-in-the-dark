@@ -1,6 +1,11 @@
 # Техническое задание (ТЗ)
 ## Проект: интерактивная карта фракций для «Клинков во Тьме»
 
+**Related documentation:**
+- **[README.md](../README.md)** - Quick start, project overview
+- **[SystemDesign.md](SystemDesign.md)** - Technical architecture, API contracts, data models
+- **[AGENTS.md](../AGENTS.md)** - AI agent instructions for development
+
 ### 1) Цель
 Создать приложение для мастера настольной ролевой игры «Клинки во Тьме», позволяющее:
 - визуализировать состояние города и территорий фракций на карте;

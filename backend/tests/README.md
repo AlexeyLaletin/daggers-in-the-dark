@@ -1,5 +1,9 @@
 # Backend Tests
 
+**Related documentation:**
+- **[../../Docs/SystemDesign.md](../../Docs/SystemDesign.md)** - API contracts and test traceability matrix
+- **[../../Docs/TZ.md](../../Docs/TZ.md)** - Technical requirements and acceptance criteria
+
 ## Structure
 
 ```

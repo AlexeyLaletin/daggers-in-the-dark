@@ -1,5 +1,9 @@
 # Frontend Tests
 
+**Related documentation:**
+- **[../../../Docs/SystemDesign.md](../../../Docs/SystemDesign.md)** - Architecture and test plan
+- **[../../../Docs/TZ.md](../../../Docs/TZ.md)** - Technical requirements and acceptance criteria
+
 ## Structure
 
 ```

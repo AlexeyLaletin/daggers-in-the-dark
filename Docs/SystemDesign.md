@@ -1,5 +1,10 @@
 # System Design: Blades Faction Map
 
+**Related documentation:**
+- **[README.md](../README.md)** - Quick start, project overview
+- **[TZ.md](TZ.md)** - Technical Specification (requirements, use cases, acceptance criteria)
+- **[AGENTS.md](../AGENTS.md)** - AI agent instructions for development
+
 ## 1. Обзор архитектуры
 
 ### 1.1 Компоненты системы

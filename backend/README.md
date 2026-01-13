@@ -2,6 +2,12 @@
 
 FastAPI backend for Blades in the Dark faction map application.
 
+**Related documentation:**
+- **[../README.md](../README.md)** - Project overview and quick start
+- **[../Docs/TZ.md](../Docs/TZ.md)** - Technical Specification
+- **[../Docs/SystemDesign.md](../Docs/SystemDesign.md)** - API contracts and data models
+- **[tests/README.md](tests/README.md)** - Testing guide
+
 ## Setup
 
 ```bash

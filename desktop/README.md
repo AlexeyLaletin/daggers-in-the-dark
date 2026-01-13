@@ -2,6 +2,11 @@
 
 Electron desktop application wrapper for Blades Faction Map.
 
+**Related documentation:**
+- **[../README.md](../README.md)** - Project overview and quick start
+- **[../Docs/TZ.md](../Docs/TZ.md)** - Technical Specification
+- **[../Docs/SystemDesign.md](../Docs/SystemDesign.md)** - Architecture overview
+
 ## Development
 
 ```bash

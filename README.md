@@ -130,11 +130,21 @@ This repo includes a project-level Cursor MCP config for **Shrimp Task Manager**
 
 ## Documentation
 
-- **[Docs/TZ.md](Docs/TZ.md)** - Technical Specification (requirements, use cases)
+### Project Documentation
+- **[Docs/TZ.md](Docs/TZ.md)** - Technical Specification (requirements, use cases, acceptance criteria)
 - **[Docs/SystemDesign.md](Docs/SystemDesign.md)** - System Design (architecture, API contracts, data models)
+
+### Development Guides
 - **[PRE_COMMIT_USAGE.md](PRE_COMMIT_USAGE.md)** - Pre-commit hooks usage guide
+- **[backend/README.md](backend/README.md)** - Backend setup and development
+- **[frontend/README.md](frontend/README.md)** - Frontend setup and development
+- **[desktop/README.md](desktop/README.md)** - Desktop (Electron) setup and development
 - **[backend/tests/README.md](backend/tests/README.md)** - Backend testing guide
 - **[frontend/src/__tests__/README.md](frontend/src/__tests__/README.md)** - Frontend testing guide
+
+### Cursor AI Agent Configuration
+- **[AGENTS.md](AGENTS.md)** - Cursor Agent instructions (vendor-neutral)
+- **[.cursor/rules/reference/INDEX.mdc](.cursor/rules/reference/INDEX.mdc)** - Documentation index for AI agents
 
 ## API Endpoints
 

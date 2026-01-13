@@ -6,6 +6,11 @@ This repository includes a set of Cursor agents and rules to keep code quality c
 
 All guidance here is **vendor-neutral** (no internal tooling assumptions) and should work in any Git-based repository.
 
+**Related documentation:**
+- **[README.md](README.md)** - Project overview, quick start, development workflow
+- **[Docs/TZ.md](Docs/TZ.md)** - Technical Specification (source of truth)
+- **[Docs/SystemDesign.md](Docs/SystemDesign.md)** - System architecture and API contracts
+
 ## Project-Specific Rules (must-follow)
 
 ### Technical Specification (ТЗ) is the source of truth
@@ -45,7 +50,7 @@ These agents are always active and provide foundational rules:
 Select the appropriate agent based on your role. These agents are automatically applied when working in their respective directories:
 
 - **[Python Developer Agent](.cursor/agents/python-developer/AGENTS.md)** - Python-specific coding standards and best practices
-- **[C++ Developer Agent](.cursor/agents/cpp-developer/AGENTS.md)** - C++-specific coding standards and best practices
+- **[Frontend Developer Agent](.cursor/agents/frontend-developer/AGENTS.md)** - Frontend engineering standards (TypeScript/React)
 - **[System Architect Agent](.cursor/agents/system-architect/AGENTS.md)** - System architecture design patterns and documentation requirements
 - **[QA Engineer Agent](.cursor/agents/qa-engineer/AGENTS.md)** - QA-specific testing guidelines and quality gates
 

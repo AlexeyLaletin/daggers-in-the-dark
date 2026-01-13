@@ -13,7 +13,6 @@ alwaysApply: false
 ### By Role
 - **Python Developer**: `.cursor/agents/python-developer/AGENTS.md` → `.cursor/rules/setup/python_tools.mdc`
 - **Frontend Developer**: `.cursor/agents/frontend-developer/AGENTS.md` → `.cursor/rules/setup/frontend_tools.mdc`
-- **C++ Developer**: `.cursor/agents/cpp-developer/AGENTS.md`
 - **System Architect**: `.cursor/agents/system-architect/AGENTS.md`
 - **QA Engineer**: `.cursor/agents/qa-engineer/AGENTS.md` → `.cursor/rules/practices/tdd.mdc`
 
@@ -54,7 +53,6 @@ alwaysApply: false
 - `shared-patterns/AGENTS.md` - Common patterns and anti-patterns
 - `python-developer/AGENTS.md` - Python-specific rules
 - `frontend-developer/AGENTS.md` - Frontend (web) engineering rules
-- `cpp-developer/AGENTS.md` - C++-specific rules
 - `system-architect/AGENTS.md` - System architecture rules
 - `qa-engineer/AGENTS.md` - QA and testing rules
 
@@ -86,11 +84,11 @@ alwaysApply: false
 
 ### Concepts
 - **Testing**: `.cursor/agents/shared-patterns/AGENTS.md`, `.cursor/agents/qa-engineer/AGENTS.md`, `.cursor/rules/practices/tdd.mdc`
-- **Error Handling**: `.cursor/agents/shared-patterns/AGENTS.md`, `.cursor/agents/python-developer/AGENTS.md`, `.cursor/agents/cpp-developer/AGENTS.md`
+- **Error Handling**: `.cursor/agents/shared-patterns/AGENTS.md`, `.cursor/agents/python-developer/AGENTS.md`
 - **Documentation**: `.cursor/agents/base/AGENTS.md`, `.cursor/rules/practices/documentation.mdc`
 - **Project Structure**: `.cursor/rules/reference/project_structure.mdc`
 - **Code Style**: `.cursor/agents/[role]/AGENTS.md`
- - **Frontend**: `.cursor/agents/frontend-developer/AGENTS.md`, `.cursor/rules/practices/frontend_best_practices.mdc`
+- **Frontend**: `.cursor/agents/frontend-developer/AGENTS.md`, `.cursor/rules/practices/frontend_best_practices.mdc`
 
 ### Tools
 - **Ruff/Mypy**: `.cursor/rules/setup/python_tools.mdc`
@@ -104,10 +102,6 @@ alwaysApply: false
 1. Read: `.cursor/agents/python-developer/AGENTS.md`
 2. Check structure: `.cursor/rules/reference/project_structure.mdc`
 3. Setup tools: `.cursor/rules/setup/python_tools.mdc`
-
-### Starting a New C++ Project
-1. Read: `.cursor/agents/cpp-developer/AGENTS.md`
-2. Check structure: `.cursor/rules/reference/project_structure.mdc`
 
 ### Code Review Checklist
 1. Base rules: `.cursor/agents/base/AGENTS.md`
