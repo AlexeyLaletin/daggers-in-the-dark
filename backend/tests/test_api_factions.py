@@ -17,7 +17,9 @@ def test_get_factions_empty(initialized_client: TestClient) -> None:
     assert response.json() == []
 
 
-def test_create_faction(initialized_client: TestClient, sample_faction: dict[str, str | float]) -> None:
+def test_create_faction(
+    initialized_client: TestClient, sample_faction: dict[str, str | float]
+) -> None:
     """Test creating a new faction."""
     response = initialized_client.post("/api/factions", json=sample_faction)
     assert response.status_code == 201
@@ -30,7 +32,9 @@ def test_create_faction(initialized_client: TestClient, sample_faction: dict[str
     assert "updated_at" in data
 
 
-def test_get_faction_by_id(initialized_client: TestClient, sample_faction: dict[str, str | float]) -> None:
+def test_get_faction_by_id(
+    initialized_client: TestClient, sample_faction: dict[str, str | float]
+) -> None:
     """Test getting a specific faction by ID."""
     # Create a faction first
     create_response = initialized_client.post("/api/factions", json=sample_faction)
@@ -50,7 +54,9 @@ def test_get_faction_not_found(initialized_client: TestClient) -> None:
     assert response.status_code == 404
 
 
-def test_update_faction(initialized_client: TestClient, sample_faction: dict[str, str | float]) -> None:
+def test_update_faction(
+    initialized_client: TestClient, sample_faction: dict[str, str | float]
+) -> None:
     """Test updating a faction."""
     # Create a faction first
     create_response = initialized_client.post("/api/factions", json=sample_faction)
@@ -66,7 +72,9 @@ def test_update_faction(initialized_client: TestClient, sample_faction: dict[str
     assert data["color"] == sample_faction["color"]  # Unchanged
 
 
-def test_delete_faction(initialized_client: TestClient, sample_faction: dict[str, str | float]) -> None:
+def test_delete_faction(
+    initialized_client: TestClient, sample_faction: dict[str, str | float]
+) -> None:
     """Test deleting a faction."""
     # Create a faction first
     create_response = initialized_client.post("/api/factions", json=sample_faction)
@@ -115,8 +123,7 @@ def test_factions_player_mode_hides_gm_fields(initialized_client: TestClient) ->
 
     # Get in Player mode
     response = initialized_client.get(
-        f"/api/factions/{faction_id}",
-        headers={"X-View-Mode": "player"}
+        f"/api/factions/{faction_id}", headers={"X-View-Mode": "player"}
     )
     assert response.status_code == 200
     data = response.json()

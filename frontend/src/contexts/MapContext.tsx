@@ -52,14 +52,22 @@ export function MapProvider({ children }: { children: ReactNode }): JSX.Element 
   const updateLayer = useCallback((layerId: string, updates: Partial<LayerState>) => {
     setMapState((prev) => ({
       ...prev,
-      layers: prev.layers.map((layer) =>
-        layer.id === layerId ? { ...layer, ...updates } : layer
-      ),
+      layers: prev.layers.map((layer) => (layer.id === layerId ? { ...layer, ...updates } : layer)),
     }));
   }, []);
 
   return (
-    <MapContext.Provider value={{ mapState, setMode, setViewport, selectPlace, selectFaction, setBrushSize, updateLayer }}>
+    <MapContext.Provider
+      value={{
+        mapState,
+        setMode,
+        setViewport,
+        selectPlace,
+        selectFaction,
+        setBrushSize,
+        updateLayer,
+      }}
+    >
       {children}
     </MapContext.Provider>
   );

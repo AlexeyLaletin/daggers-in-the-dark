@@ -50,7 +50,9 @@ function App(): JSX.Element {
 
   // Show initialization modal if project is not initialized
   if (!isInitialized) {
-    return <ProjectInitModal onSubmit={handleInitProject} isSubmitting={isSubmitting} error={error} />;
+    return (
+      <ProjectInitModal onSubmit={handleInitProject} isSubmitting={isSubmitting} error={error} />
+    );
   }
 
   return (
@@ -72,9 +74,7 @@ function App(): JSX.Element {
         <Drawer isOpen={drawerOpen} onToggle={() => setDrawerOpen(!drawerOpen)}>
           <div style={{ padding: "1rem 1rem 0 1rem" }}>
             <h1 style={{ margin: 0, fontSize: "1.5rem" }}>Blades</h1>
-            <p style={{ fontSize: "0.9rem", color: "#666", marginBottom: "1rem" }}>
-              Faction Map
-            </p>
+            <p style={{ fontSize: "0.9rem", color: "#666", marginBottom: "1rem" }}>Faction Map</p>
           </div>
           <DrawerTabs activeTab={activeTab} onTabChange={setActiveTab} />
           <DrawerContent activeTab={activeTab}>
@@ -87,9 +87,7 @@ function App(): JSX.Element {
             {activeTab === "events" && (
               <div>
                 <h2 style={{ marginTop: 0 }}>Events</h2>
-                <p style={{ color: "#666", fontSize: "0.9rem" }}>
-                  Coming soon: Event timeline
-                </p>
+                <p style={{ color: "#666", fontSize: "0.9rem" }}>Coming soon: Event timeline</p>
               </div>
             )}
             {activeTab === "project" && <ProjectPanel />}

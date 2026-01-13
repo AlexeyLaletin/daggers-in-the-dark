@@ -9,6 +9,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 class Base(DeclarativeBase):
     """Base class for all models."""
+
     pass
 
 
@@ -22,15 +23,29 @@ class World(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     timezone: Mapped[str] = mapped_column(Text, nullable=False, default="UTC")
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
-    factions: Mapped[list["Faction"]] = relationship(back_populates="world", cascade="all, delete-orphan")
-    people: Mapped[list["Person"]] = relationship(back_populates="world", cascade="all, delete-orphan")
-    places: Mapped[list["Place"]] = relationship(back_populates="world", cascade="all, delete-orphan")
-    note_pages: Mapped[list["NotePage"]] = relationship(back_populates="world", cascade="all, delete-orphan")
-    snapshots: Mapped[list["Snapshot"]] = relationship(back_populates="world", cascade="all, delete-orphan")
-    events: Mapped[list["Event"]] = relationship(back_populates="world", cascade="all, delete-orphan")
+    factions: Mapped[list["Faction"]] = relationship(
+        back_populates="world", cascade="all, delete-orphan"
+    )
+    people: Mapped[list["Person"]] = relationship(
+        back_populates="world", cascade="all, delete-orphan"
+    )
+    places: Mapped[list["Place"]] = relationship(
+        back_populates="world", cascade="all, delete-orphan"
+    )
+    note_pages: Mapped[list["NotePage"]] = relationship(
+        back_populates="world", cascade="all, delete-orphan"
+    )
+    snapshots: Mapped[list["Snapshot"]] = relationship(
+        back_populates="world", cascade="all, delete-orphan"
+    )
+    events: Mapped[list["Event"]] = relationship(
+        back_populates="world", cascade="all, delete-orphan"
+    )
 
 
 class Faction(Base):
@@ -46,12 +61,18 @@ class Faction(Base):
     notes_public: Mapped[str | None] = mapped_column(Text, nullable=True)
     notes_gm: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
     world: Mapped["World"] = relationship(back_populates="factions")
-    memberships: Mapped[list["FactionMembership"]] = relationship(back_populates="faction", cascade="all, delete-orphan")
-    territory_tiles: Mapped[list["TerritoryTile"]] = relationship(back_populates="faction", cascade="all, delete-orphan")
+    memberships: Mapped[list["FactionMembership"]] = relationship(
+        back_populates="faction", cascade="all, delete-orphan"
+    )
+    territory_tiles: Mapped[list["TerritoryTile"]] = relationship(
+        back_populates="faction", cascade="all, delete-orphan"
+    )
 
 
 class Person(Base):
@@ -70,14 +91,24 @@ class Person(Base):
     notes_public: Mapped[str | None] = mapped_column(Text, nullable=True)
     notes_gm: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
     world: Mapped["World"] = relationship(back_populates="people")
-    memberships: Mapped[list["FactionMembership"]] = relationship(back_populates="person", cascade="all, delete-orphan")
-    workplace: Mapped[Optional["Place"]] = relationship(foreign_keys=[workplace_place_id], back_populates="workers")
-    home: Mapped[Optional["Place"]] = relationship(foreign_keys=[home_place_id], back_populates="residents")
-    player_character: Mapped[Optional["PlayerCharacter"]] = relationship(back_populates="person", uselist=False)
+    memberships: Mapped[list["FactionMembership"]] = relationship(
+        back_populates="person", cascade="all, delete-orphan"
+    )
+    workplace: Mapped[Optional["Place"]] = relationship(
+        foreign_keys=[workplace_place_id], back_populates="workers"
+    )
+    home: Mapped[Optional["Place"]] = relationship(
+        foreign_keys=[home_place_id], back_populates="residents"
+    )
+    player_character: Mapped[Optional["PlayerCharacter"]] = relationship(
+        back_populates="person", uselist=False
+    )
 
 
 class PlayerCharacter(Base):
@@ -85,7 +116,9 @@ class PlayerCharacter(Base):
 
     __tablename__ = "player_characters"
 
-    person_id: Mapped[str] = mapped_column(ForeignKey("people.id", ondelete="CASCADE"), primary_key=True)
+    person_id: Mapped[str] = mapped_column(
+        ForeignKey("people.id", ondelete="CASCADE"), primary_key=True
+    )
     playbook: Mapped[str | None] = mapped_column(Text, nullable=True)
     crew: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
@@ -100,8 +133,12 @@ class FactionMembership(Base):
     __tablename__ = "faction_memberships"
 
     id: Mapped[str] = mapped_column(Text, primary_key=True)
-    person_id: Mapped[str] = mapped_column(ForeignKey("people.id", ondelete="CASCADE"), nullable=False, index=True)
-    faction_id: Mapped[str] = mapped_column(ForeignKey("factions.id", ondelete="CASCADE"), nullable=False, index=True)
+    person_id: Mapped[str] = mapped_column(
+        ForeignKey("people.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    faction_id: Mapped[str] = mapped_column(
+        ForeignKey("factions.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     role: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Relationships
@@ -119,19 +156,31 @@ class Place(Base):
     name: Mapped[str] = mapped_column(Text, nullable=False, index=True)
     type: Mapped[str] = mapped_column(Text, nullable=False)  # building|district|landmark|other
     position: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON {x, y}
-    owner_faction_id: Mapped[str | None] = mapped_column(ForeignKey("factions.id", ondelete="SET NULL"), nullable=True)
-    parent_place_id: Mapped[str | None] = mapped_column(ForeignKey("places.id", ondelete="SET NULL"), nullable=True, index=True)
+    owner_faction_id: Mapped[str | None] = mapped_column(
+        ForeignKey("factions.id", ondelete="SET NULL"), nullable=True
+    )
+    parent_place_id: Mapped[str | None] = mapped_column(
+        ForeignKey("places.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     scope: Mapped[str] = mapped_column(Text, nullable=False, default="public")  # public|gm|player
     notes_public: Mapped[str | None] = mapped_column(Text, nullable=True)
     notes_gm: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
     world: Mapped["World"] = relationship(back_populates="places")
-    workers: Mapped[list["Person"]] = relationship(foreign_keys="Person.workplace_place_id", back_populates="workplace")
-    residents: Mapped[list["Person"]] = relationship(foreign_keys="Person.home_place_id", back_populates="home")
-    parent: Mapped[Optional["Place"]] = relationship(remote_side="Place.id", back_populates="children")
+    workers: Mapped[list["Person"]] = relationship(
+        foreign_keys="Person.workplace_place_id", back_populates="workplace"
+    )
+    residents: Mapped[list["Person"]] = relationship(
+        foreign_keys="Person.home_place_id", back_populates="home"
+    )
+    parent: Mapped[Optional["Place"]] = relationship(
+        remote_side="Place.id", back_populates="children"
+    )
     children: Mapped[list["Place"]] = relationship(back_populates="parent")
 
 
@@ -148,12 +197,18 @@ class NotePage(Base):
     entity_type: Mapped[str | None] = mapped_column(Text, nullable=True)  # faction|person|place
     entity_id: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
     world: Mapped["World"] = relationship(back_populates="note_pages")
-    links_from: Mapped[list["Link"]] = relationship(foreign_keys="Link.from_page_id", back_populates="from_page", cascade="all, delete-orphan")
-    links_to: Mapped[list["Link"]] = relationship(foreign_keys="Link.to_page_id", back_populates="to_page", cascade="all, delete-orphan")
+    links_from: Mapped[list["Link"]] = relationship(
+        foreign_keys="Link.from_page_id", back_populates="from_page", cascade="all, delete-orphan"
+    )
+    links_to: Mapped[list["Link"]] = relationship(
+        foreign_keys="Link.to_page_id", back_populates="to_page", cascade="all, delete-orphan"
+    )
 
 
 class Link(Base):
@@ -163,15 +218,21 @@ class Link(Base):
 
     id: Mapped[str] = mapped_column(Text, primary_key=True)
     world_id: Mapped[str] = mapped_column(ForeignKey("worlds.id"), nullable=False, index=True)
-    from_page_id: Mapped[str] = mapped_column(ForeignKey("note_pages.id", ondelete="CASCADE"), nullable=False, index=True)
-    to_page_id: Mapped[str] = mapped_column(ForeignKey("note_pages.id", ondelete="CASCADE"), nullable=False, index=True)
+    from_page_id: Mapped[str] = mapped_column(
+        ForeignKey("note_pages.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    to_page_id: Mapped[str] = mapped_column(
+        ForeignKey("note_pages.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     link_type: Mapped[str] = mapped_column(Text, nullable=False)  # wikilink|manual|reference
     scope: Mapped[str] = mapped_column(Text, nullable=False, default="public")  # public|gm|player
     meta: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON metadata
 
     # Relationships
     world: Mapped["World"] = relationship()
-    from_page: Mapped["NotePage"] = relationship(foreign_keys=[from_page_id], back_populates="links_from")
+    from_page: Mapped["NotePage"] = relationship(
+        foreign_keys=[from_page_id], back_populates="links_from"
+    )
     to_page: Mapped["NotePage"] = relationship(foreign_keys=[to_page_id], back_populates="links_to")
 
 
@@ -188,8 +249,12 @@ class Snapshot(Base):
 
     # Relationships
     world: Mapped["World"] = relationship(back_populates="snapshots")
-    map_assets: Mapped[list["MapAsset"]] = relationship(back_populates="snapshot", cascade="all, delete-orphan")
-    territory_tiles: Mapped[list["TerritoryTile"]] = relationship(back_populates="snapshot", cascade="all, delete-orphan")
+    map_assets: Mapped[list["MapAsset"]] = relationship(
+        back_populates="snapshot", cascade="all, delete-orphan"
+    )
+    territory_tiles: Mapped[list["TerritoryTile"]] = relationship(
+        back_populates="snapshot", cascade="all, delete-orphan"
+    )
 
 
 class MapAsset(Base):
@@ -198,7 +263,9 @@ class MapAsset(Base):
     __tablename__ = "map_assets"
 
     id: Mapped[str] = mapped_column(Text, primary_key=True)
-    snapshot_id: Mapped[str] = mapped_column(ForeignKey("snapshots.id", ondelete="CASCADE"), nullable=False)
+    snapshot_id: Mapped[str] = mapped_column(
+        ForeignKey("snapshots.id", ondelete="CASCADE"), nullable=False
+    )
     image_blob: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     width: Mapped[int] = mapped_column(Integer, nullable=False)
     height: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -213,8 +280,12 @@ class TerritoryTile(Base):
     __tablename__ = "territory_tiles"
 
     id: Mapped[str] = mapped_column(Text, primary_key=True)
-    snapshot_id: Mapped[str] = mapped_column(ForeignKey("snapshots.id", ondelete="CASCADE"), nullable=False, index=True)
-    faction_id: Mapped[str] = mapped_column(ForeignKey("factions.id", ondelete="CASCADE"), nullable=False, index=True)
+    snapshot_id: Mapped[str] = mapped_column(
+        ForeignKey("snapshots.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    faction_id: Mapped[str] = mapped_column(
+        ForeignKey("factions.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     z: Mapped[int] = mapped_column(Integer, nullable=False)  # zoom level
     x: Mapped[int] = mapped_column(Integer, nullable=False)  # tile x
     y: Mapped[int] = mapped_column(Integer, nullable=False)  # tile y
@@ -229,9 +300,7 @@ class ActiveSnapshot(Base):
     """Singleton table for active snapshot."""
 
     __tablename__ = "active_snapshot"
-    __table_args__ = (
-        CheckConstraint("id = '1'", name="singleton_check"),
-    )
+    __table_args__ = (CheckConstraint("id = '1'", name="singleton_check"),)
 
     id: Mapped[str] = mapped_column(Text, primary_key=True, default="1")
     snapshot_id: Mapped[str] = mapped_column(ForeignKey("snapshots.id"), nullable=False)
@@ -248,11 +317,15 @@ class Event(Base):
     title: Mapped[str] = mapped_column(Text, nullable=False)
     body_markdown: Mapped[str | None] = mapped_column(Text, nullable=True)
     scope: Mapped[str] = mapped_column(Text, nullable=False, default="gm")  # public|gm|player
-    snapshot_id: Mapped[str | None] = mapped_column(ForeignKey("snapshots.id", ondelete="SET NULL"), nullable=True)
+    snapshot_id: Mapped[str | None] = mapped_column(
+        ForeignKey("snapshots.id", ondelete="SET NULL"), nullable=True
+    )
 
     # Relationships
     world: Mapped["World"] = relationship(back_populates="events")
-    refs: Mapped[list["EventRef"]] = relationship(back_populates="event", cascade="all, delete-orphan")
+    refs: Mapped[list["EventRef"]] = relationship(
+        back_populates="event", cascade="all, delete-orphan"
+    )
 
 
 class EventRef(Base):
@@ -261,8 +334,12 @@ class EventRef(Base):
     __tablename__ = "event_refs"
 
     id: Mapped[str] = mapped_column(Text, primary_key=True)
-    event_id: Mapped[str] = mapped_column(ForeignKey("events.id", ondelete="CASCADE"), nullable=False, index=True)
-    entity_type: Mapped[str] = mapped_column(Text, nullable=False, index=True)  # faction|person|place|page
+    event_id: Mapped[str] = mapped_column(
+        ForeignKey("events.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    entity_type: Mapped[str] = mapped_column(
+        Text, nullable=False, index=True
+    )  # faction|person|place|page
     entity_id: Mapped[str] = mapped_column(Text, nullable=False, index=True)
     role: Mapped[str | None] = mapped_column(Text, nullable=True)  # involved|location|target|etc
 

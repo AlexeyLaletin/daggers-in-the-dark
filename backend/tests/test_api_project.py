@@ -12,7 +12,7 @@ def test_init_project_success(client: TestClient) -> None:
             "description": "A test world",
             "timezone": "America/New_York",
             "initial_snapshot_label": "Beginning",
-        }
+        },
     )
     assert response.status_code == 201
     data = response.json()
@@ -51,8 +51,7 @@ def test_crud_without_init_fails(client: TestClient) -> None:
     """Test that CRUD operations fail without project initialization."""
     # Try to create a faction
     response = client.post(
-        "/api/factions",
-        json={"name": "Test Faction", "color": "#FF0000", "opacity": 0.5}
+        "/api/factions", json={"name": "Test Faction", "color": "#FF0000", "opacity": 0.5}
     )
     assert response.status_code == 409
     assert "not initialized" in response.json()["detail"].lower()

@@ -132,7 +132,10 @@ export function MapCanvas({ onPlaceClick, onMapClick }: MapCanvasProps): JSX.Ele
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       if (mapState.mode === "pan") {
         setIsDragging(true);
-        setDragStart({ x: e.clientX - mapState.viewport.offsetX, y: e.clientY - mapState.viewport.offsetY });
+        setDragStart({
+          x: e.clientX - mapState.viewport.offsetX,
+          y: e.clientY - mapState.viewport.offsetY,
+        });
       }
     },
     [mapState.mode, mapState.viewport]
@@ -193,8 +196,10 @@ export function MapCanvas({ onPlaceClick, onMapClick }: MapCanvasProps): JSX.Ele
       const mouseY = e.clientY - rect.top;
 
       // Zoom towards mouse position
-      const newOffsetX = mouseX - ((mouseX - mapState.viewport.offsetX) * newScale) / mapState.viewport.scale;
-      const newOffsetY = mouseY - ((mouseY - mapState.viewport.offsetY) * newScale) / mapState.viewport.scale;
+      const newOffsetX =
+        mouseX - ((mouseX - mapState.viewport.offsetX) * newScale) / mapState.viewport.scale;
+      const newOffsetY =
+        mouseY - ((mouseY - mapState.viewport.offsetY) * newScale) / mapState.viewport.scale;
 
       setViewport({
         offsetX: newOffsetX,

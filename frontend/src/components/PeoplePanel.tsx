@@ -97,7 +97,14 @@ export function PeoplePanel(): JSX.Element {
 
   return (
     <div style={{ padding: "1rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1rem",
+        }}
+      >
         <h2 style={{ margin: 0 }}>People</h2>
         {!isCreating && (
           <button
@@ -134,7 +141,15 @@ export function PeoplePanel(): JSX.Element {
 
       {/* Create/Edit form */}
       {isCreating && (
-        <form onSubmit={handleSubmit} style={{ marginBottom: "1.5rem", padding: "1rem", backgroundColor: "#f5f5f5", borderRadius: "4px" }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            marginBottom: "1.5rem",
+            padding: "1rem",
+            backgroundColor: "#f5f5f5",
+            borderRadius: "4px",
+          }}
+        >
           <h3 style={{ marginTop: 0, fontSize: "1rem" }}>{editingId ? "Edit" : "Create"} Person</h3>
 
           <input
@@ -255,7 +270,9 @@ export function PeoplePanel(): JSX.Element {
                 backgroundColor: "#fff",
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+              <div
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}
+              >
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: "bold", marginBottom: "0.25rem" }}>
                     {person.name}
@@ -269,7 +286,14 @@ export function PeoplePanel(): JSX.Element {
                     </div>
                   )}
                   {viewMode === "gm" && person.notes_gm && (
-                    <div style={{ fontSize: "0.85rem", color: "#d32f2f", marginTop: "0.25rem", fontStyle: "italic" }}>
+                    <div
+                      style={{
+                        fontSize: "0.85rem",
+                        color: "#d32f2f",
+                        marginTop: "0.25rem",
+                        fontStyle: "italic",
+                      }}
+                    >
                       🔒 {person.notes_gm}
                     </div>
                   )}

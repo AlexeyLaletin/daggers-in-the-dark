@@ -26,23 +26,24 @@ class LinkRepository:
     def list_by_from_page(self, from_page_id: str) -> list[Link]:
         """List all links from a page."""
         return list(
-            self.session.execute(
-                select(Link).where(Link.from_page_id == from_page_id)
-            ).scalars().all()
+            self.session.execute(select(Link).where(Link.from_page_id == from_page_id))
+            .scalars()
+            .all()
         )
 
     def list_wikilinks_from_page(self, from_page_id: str) -> list[Link]:
         """List wikilinks from a page."""
         return list(
             self.session.execute(
-                select(Link).where(
-                    Link.from_page_id == from_page_id,
-                    Link.link_type == "wikilink"
-                )
-            ).scalars().all()
+                select(Link).where(Link.from_page_id == from_page_id, Link.link_type == "wikilink")
+            )
+            .scalars()
+            .all()
         )
 
-    def get_backlinks(self, to_page_id: str, view_mode: Literal["gm", "player"] = "gm") -> list[NotePage]:
+    def get_backlinks(
+        self, to_page_id: str, view_mode: Literal["gm", "player"] = "gm"
+    ) -> list[NotePage]:
         """Get all pages that link to the given page."""
         query = (
             select(NotePage)

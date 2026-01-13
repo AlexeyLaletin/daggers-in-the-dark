@@ -39,7 +39,7 @@ async def list_factions(
                 "created_at": f.created_at,
                 "updated_at": f.updated_at,
             },
-            view_mode
+            view_mode,
         )
         for f in factions
     ]
@@ -91,7 +91,7 @@ async def get_faction(
             "created_at": faction.created_at,
             "updated_at": faction.updated_at,
         },
-        view_mode
+        view_mode,
     )
 
 

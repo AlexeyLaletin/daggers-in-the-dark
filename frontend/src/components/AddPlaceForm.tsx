@@ -79,7 +79,10 @@ export function AddPlaceForm({ position, onSuccess, onCancel }: AddPlaceFormProp
       )}
 
       <div style={{ marginBottom: "1rem" }}>
-        <label htmlFor="place-name" style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem" }}>
+        <label
+          htmlFor="place-name"
+          style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem" }}
+        >
           Name *
         </label>
         <input
@@ -100,7 +103,10 @@ export function AddPlaceForm({ position, onSuccess, onCancel }: AddPlaceFormProp
       </div>
 
       <div style={{ marginBottom: "1rem" }}>
-        <label htmlFor="place-type" style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem" }}>
+        <label
+          htmlFor="place-type"
+          style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem" }}
+        >
           Type
         </label>
         <select
@@ -123,7 +129,10 @@ export function AddPlaceForm({ position, onSuccess, onCancel }: AddPlaceFormProp
       </div>
 
       <div style={{ marginBottom: "1rem" }}>
-        <label htmlFor="notes-public" style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem" }}>
+        <label
+          htmlFor="notes-public"
+          style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem" }}
+        >
           Public Notes
         </label>
         <textarea
@@ -145,7 +154,10 @@ export function AddPlaceForm({ position, onSuccess, onCancel }: AddPlaceFormProp
       {viewMode === "gm" && (
         <>
           <div style={{ marginBottom: "1rem" }}>
-            <label htmlFor="notes-gm" style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem" }}>
+            <label
+              htmlFor="notes-gm"
+              style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem" }}
+            >
               GM Notes
             </label>
             <textarea
@@ -195,7 +207,15 @@ export function AddPlaceForm({ position, onSuccess, onCancel }: AddPlaceFormProp
       )}
 
       {viewMode === "player" && (
-        <div style={{ padding: "0.5rem", backgroundColor: "#e3f2fd", borderRadius: "4px", fontSize: "0.85rem", marginBottom: "1rem" }}>
+        <div
+          style={{
+            padding: "0.5rem",
+            backgroundColor: "#e3f2fd",
+            borderRadius: "4px",
+            fontSize: "0.85rem",
+            marginBottom: "1rem",
+          }}
+        >
           ℹ️ Places created by players are public by default
         </div>
       )}

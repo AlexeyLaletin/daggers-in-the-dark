@@ -8,7 +8,10 @@ export function MapToolbar(): JSX.Element {
   const [factions, setFactions] = useState<Faction[]>([]);
 
   useEffect(() => {
-    apiClient.getFactions().then(setFactions).catch(() => setFactions([]));
+    apiClient
+      .getFactions()
+      .then(setFactions)
+      .catch(() => setFactions([]));
   }, []);
 
   const handleModeChange = (mode: MapMode) => {

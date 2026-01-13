@@ -1,6 +1,5 @@
 """Graph building and querying service."""
 
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -19,9 +18,7 @@ class GraphService:
         self.link_repo = LinkRepository(session)
         self.visibility = VisibilityService()
 
-    def get_graph(
-        self, view_mode: ViewMode = "gm"
-    ) -> tuple[list[NotePage], list[Link]]:
+    def get_graph(self, view_mode: ViewMode = "gm") -> tuple[list[NotePage], list[Link]]:
         """
         Get the full graph of pages and links with visibility filtering.
 
@@ -46,15 +43,14 @@ class GraphService:
 
         # Filter edges to only include links between visible nodes
         links = [
-            link for link in all_links
+            link
+            for link in all_links
             if link.from_page_id in visible_node_ids and link.to_page_id in visible_node_ids
         ]
 
         return pages, links
 
-    def get_backlinks(
-        self, page_id: str, view_mode: ViewMode = "gm"
-    ) -> list[NotePage]:
+    def get_backlinks(self, page_id: str, view_mode: ViewMode = "gm") -> list[NotePage]:
         """
         Get all pages that link to the given page.
 

@@ -85,9 +85,7 @@ class SnapshotsService:
 
         # Clone territory tiles
         source_tiles = (
-            self.session.query(TerritoryTile)
-            .filter(TerritoryTile.snapshot_id == source_id)
-            .all()
+            self.session.query(TerritoryTile).filter(TerritoryTile.snapshot_id == source_id).all()
         )
 
         for source_tile in source_tiles:
@@ -103,11 +101,7 @@ class SnapshotsService:
             self.session.add(cloned_tile)
 
         # Clone map asset if exists
-        source_map = (
-            self.session.query(MapAsset)
-            .filter(MapAsset.snapshot_id == source_id)
-            .first()
-        )
+        source_map = self.session.query(MapAsset).filter(MapAsset.snapshot_id == source_id).first()
 
         if source_map:
             cloned_map = MapAsset(
@@ -153,10 +147,7 @@ class SnapshotsService:
         active = self.snapshot_repo.get_active()
         if active and active.snapshot_id == snapshot_id:
             # Switch to another snapshot or delete active record
-            remaining = [
-                s for s in self.snapshot_repo.list_all()
-                if s.id != snapshot_id
-            ]
+            remaining = [s for s in self.snapshot_repo.list_all() if s.id != snapshot_id]
             if remaining:
                 # Switch to first remaining snapshot
                 self.snapshot_repo.set_active(remaining[0].id)

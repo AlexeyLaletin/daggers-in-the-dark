@@ -44,7 +44,12 @@ def test_create_snapshot_with_clone_from(client: TestClient, seed_small_town: di
     tiles_data = {
         "faction_id": faction_id,
         "tiles": [
-            {"z": 0, "x": 0, "y": 0, "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="},
+            {
+                "z": 0,
+                "x": 0,
+                "y": 0,
+                "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+            },
         ],
     }
     client.put(f"/api/snapshots/{source_snapshot_id}/territory/tiles/batch", json=tiles_data)

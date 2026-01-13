@@ -89,6 +89,7 @@ async def get_snapshot(
 ) -> SnapshotResponse:
     """Get a snapshot by ID."""
     from app.models import Snapshot
+
     snapshot = session.get(Snapshot, snapshot_id)
     if not snapshot:
         raise HTTPException(status_code=404, detail="Snapshot not found")

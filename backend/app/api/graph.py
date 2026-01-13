@@ -104,6 +104,7 @@ async def get_page_backlinks(
     """
     # Check if page exists
     from app.models import NotePage
+
     page = session.get(NotePage, page_id)
     if not page:
         raise HTTPException(status_code=404, detail="Page not found")

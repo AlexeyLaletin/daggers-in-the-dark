@@ -7,7 +7,11 @@ export const TILE_SIZE = 256;
 /**
  * Get tile coordinates for a given map position and zoom level
  */
-export function getTileCoords(mapX: number, mapY: number, _zoom: number = 0): { x: number; y: number } {
+export function getTileCoords(
+  mapX: number,
+  mapY: number,
+  _zoom: number = 0
+): { x: number; y: number } {
   return {
     x: Math.floor(mapX / TILE_SIZE),
     y: Math.floor(mapY / TILE_SIZE),
@@ -26,16 +30,22 @@ export function getVisibleTiles(
   zoom: number = 0
 ): Array<{ z: number; x: number; y: number }> {
   // Calculate the map coordinates of viewport corners
-  const topLeftX = (-viewport.offsetX) / viewport.scale;
-  const topLeftY = (-viewport.offsetY) / viewport.scale;
+  const topLeftX = -viewport.offsetX / viewport.scale;
+  const topLeftY = -viewport.offsetY / viewport.scale;
   const bottomRightX = (canvasWidth - viewport.offsetX) / viewport.scale;
   const bottomRightY = (canvasHeight - viewport.offsetY) / viewport.scale;
 
   // Get tile ranges
   const minTileX = Math.max(0, Math.floor(topLeftX / TILE_SIZE));
   const minTileY = Math.max(0, Math.floor(topLeftY / TILE_SIZE));
-  const maxTileX = Math.min(Math.ceil(mapWidth / TILE_SIZE) - 1, Math.floor(bottomRightX / TILE_SIZE));
-  const maxTileY = Math.min(Math.ceil(mapHeight / TILE_SIZE) - 1, Math.floor(bottomRightY / TILE_SIZE));
+  const maxTileX = Math.min(
+    Math.ceil(mapWidth / TILE_SIZE) - 1,
+    Math.floor(bottomRightX / TILE_SIZE)
+  );
+  const maxTileY = Math.min(
+    Math.ceil(mapHeight / TILE_SIZE) - 1,
+    Math.floor(bottomRightY / TILE_SIZE)
+  );
 
   const tiles: Array<{ z: number; x: number; y: number }> = [];
   for (let x = minTileX; x <= maxTileX; x++) {

@@ -93,7 +93,14 @@ export function FactionList(): JSX.Element {
 
   return (
     <div style={{ padding: "1rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1rem",
+        }}
+      >
         <h2 style={{ margin: 0 }}>Factions</h2>
         {!isCreating && (
           <button
@@ -130,8 +137,18 @@ export function FactionList(): JSX.Element {
 
       {/* Create/Edit form */}
       {isCreating && (
-        <form onSubmit={handleSubmit} style={{ marginBottom: "1.5rem", padding: "1rem", backgroundColor: "#f5f5f5", borderRadius: "4px" }}>
-          <h3 style={{ marginTop: 0, fontSize: "1rem" }}>{editingId ? "Edit" : "Create"} Faction</h3>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            marginBottom: "1.5rem",
+            padding: "1rem",
+            backgroundColor: "#f5f5f5",
+            borderRadius: "4px",
+          }}
+        >
+          <h3 style={{ marginTop: 0, fontSize: "1rem" }}>
+            {editingId ? "Edit" : "Create"} Faction
+          </h3>
 
           <input
             type="text"
@@ -151,12 +168,19 @@ export function FactionList(): JSX.Element {
 
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
             <div style={{ flex: 1 }}>
-              <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "0.25rem" }}>Color</label>
+              <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "0.25rem" }}>
+                Color
+              </label>
               <input
                 type="color"
                 value={formData.color}
                 onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                style={{ width: "100%", height: "40px", border: "1px solid #ccc", borderRadius: "4px" }}
+                style={{
+                  width: "100%",
+                  height: "40px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                }}
               />
             </div>
             <div style={{ flex: 1 }}>
@@ -245,7 +269,9 @@ export function FactionList(): JSX.Element {
       )}
 
       {factions.length === 0 ? (
-        <p style={{ color: "#666", fontSize: "0.9rem" }}>No factions yet. Create one to get started.</p>
+        <p style={{ color: "#666", fontSize: "0.9rem" }}>
+          No factions yet. Create one to get started.
+        </p>
       ) : (
         <ul style={{ listStyle: "none", padding: 0 }}>
           {factions.map((faction) => (
@@ -260,7 +286,9 @@ export function FactionList(): JSX.Element {
                 }}
                 onClick={() => selectFaction(faction.id)}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                <div
+                  style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}
+                >
                   <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1 }}>
                     <div
                       style={{
@@ -282,7 +310,10 @@ export function FactionList(): JSX.Element {
                       )}
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: "0.5rem" }} onClick={(e) => e.stopPropagation()}>
+                  <div
+                    style={{ display: "flex", gap: "0.5rem" }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <button
                       onClick={() => handleEdit(faction)}
                       style={{
@@ -319,8 +350,17 @@ export function FactionList(): JSX.Element {
         </ul>
       )}
 
-      <div style={{ marginTop: "1rem", padding: "0.75rem", backgroundColor: "#e3f2fd", borderRadius: "4px", fontSize: "0.85rem" }}>
-        💡 <strong>Tip:</strong> Click on a faction to select it for territory painting in Brush mode.
+      <div
+        style={{
+          marginTop: "1rem",
+          padding: "0.75rem",
+          backgroundColor: "#e3f2fd",
+          borderRadius: "4px",
+          fontSize: "0.85rem",
+        }}
+      >
+        💡 <strong>Tip:</strong> Click on a faction to select it for territory painting in Brush
+        mode.
       </div>
     </div>
   );

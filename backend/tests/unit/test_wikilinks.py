@@ -1,7 +1,6 @@
 """Unit tests for wikilinks parser."""
 
 
-
 def test_parse_simple_wikilink() -> None:
     """Test parsing simple [[Page Title]] wikilink."""
     # Will implement after wikilinks module is created

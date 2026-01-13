@@ -97,9 +97,7 @@ def test_get_place_player_mode_404_for_gm_place(client: TestClient) -> None:
     assert response_gm.status_code == 200
 
     # Player mode gets 404
-    response_player = client.get(
-        f"/api/places/{place_id}", headers={"X-View-Mode": "player"}
-    )
+    response_player = client.get(f"/api/places/{place_id}", headers={"X-View-Mode": "player"})
     assert response_player.status_code == 404
 
 
@@ -137,9 +135,7 @@ def test_delete_place_player_mode_404_for_gm_place(client: TestClient) -> None:
     place_id = response.json()["id"]
 
     # Player mode gets 404 when trying to delete
-    response_player = client.delete(
-        f"/api/places/{place_id}", headers={"X-View-Mode": "player"}
-    )
+    response_player = client.delete(f"/api/places/{place_id}", headers={"X-View-Mode": "player"})
     assert response_player.status_code == 404
 
     # Verify place still exists (GM can see it)

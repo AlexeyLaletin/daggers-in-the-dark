@@ -11,9 +11,7 @@ from app.services.project_service import ProjectService
 from app.services.visibility import ViewMode
 
 
-def get_view_mode(
-    x_view_mode: Annotated[str, Header(alias="X-View-Mode")] = "gm"
-) -> ViewMode:
+def get_view_mode(x_view_mode: Annotated[str, Header(alias="X-View-Mode")] = "gm") -> ViewMode:
     """
     Get view mode from request header.
 
@@ -28,9 +26,7 @@ def get_view_mode(
     return "gm"
 
 
-def require_initialized_project(
-    session: Annotated[Session, Depends(get_session)]
-) -> World:
+def require_initialized_project(session: Annotated[Session, Depends(get_session)]) -> World:
     """
     Dependency that ensures project is initialized.
 

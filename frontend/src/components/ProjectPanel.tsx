@@ -38,7 +38,11 @@ export function ProjectPanel(): JSX.Element {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!confirm("WARNING: Importing will replace ALL current data. Are you sure you want to continue?")) {
+    if (
+      !confirm(
+        "WARNING: Importing will replace ALL current data. Are you sure you want to continue?"
+      )
+    ) {
       e.target.value = "";
       return;
     }
@@ -69,7 +73,14 @@ export function ProjectPanel(): JSX.Element {
 
       {/* World info */}
       {world && (
-        <div style={{ padding: "1rem", marginBottom: "1.5rem", backgroundColor: "#f5f5f5", borderRadius: "4px" }}>
+        <div
+          style={{
+            padding: "1rem",
+            marginBottom: "1.5rem",
+            backgroundColor: "#f5f5f5",
+            borderRadius: "4px",
+          }}
+        >
           <h3 style={{ marginTop: 0, fontSize: "1rem" }}>Current Project</h3>
           <div style={{ fontSize: "0.9rem", marginBottom: "0.5rem" }}>
             <strong>Name:</strong> {world.name}
@@ -123,7 +134,8 @@ export function ProjectPanel(): JSX.Element {
       <div style={{ marginBottom: "2rem" }}>
         <h3 style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>Export Project</h3>
         <p style={{ fontSize: "0.9rem", color: "#666", marginBottom: "1rem" }}>
-          Download your entire project (including all data, snapshots, and territory tiles) as a single database file.
+          Download your entire project (including all data, snapshots, and territory tiles) as a
+          single database file.
         </p>
         <button
           onClick={handleExport}
@@ -161,8 +173,8 @@ export function ProjectPanel(): JSX.Element {
           }}
         >
           <strong>⚠️ WARNING:</strong> Importing will permanently delete ALL current project data
-          (factions, people, places, pages, snapshots, territories).
-          Make sure to export your current project first!
+          (factions, people, places, pages, snapshots, territories). Make sure to export your
+          current project first!
         </div>
         <label
           htmlFor="import-file"
@@ -191,9 +203,17 @@ export function ProjectPanel(): JSX.Element {
       </div>
 
       {/* Help section */}
-      <div style={{ marginTop: "2rem", padding: "1rem", backgroundColor: "#e3f2fd", borderRadius: "4px", fontSize: "0.85rem" }}>
-        <strong>💡 Tip:</strong> Regularly export your project to create backups.
-        The exported .db file contains everything and can be imported on another device.
+      <div
+        style={{
+          marginTop: "2rem",
+          padding: "1rem",
+          backgroundColor: "#e3f2fd",
+          borderRadius: "4px",
+          fontSize: "0.85rem",
+        }}
+      >
+        <strong>💡 Tip:</strong> Regularly export your project to create backups. The exported .db
+        file contains everything and can be imported on another device.
       </div>
     </div>
   );

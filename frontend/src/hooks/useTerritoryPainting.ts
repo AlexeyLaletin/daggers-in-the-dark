@@ -75,13 +75,7 @@ export function useTerritoryPainting(factions: Faction[]) {
 
   // Paint on tile
   const paintOnTile = useCallback(
-    (
-      factionId: string,
-      mapX: number,
-      mapY: number,
-      brushSize: number,
-      isEraser: boolean
-    ): void => {
+    (factionId: string, mapX: number, mapY: number, brushSize: number, isEraser: boolean): void => {
       const tileX = Math.floor(mapX / TILE_SIZE);
       const tileY = Math.floor(mapY / TILE_SIZE);
       const localX = mapX - tileX * TILE_SIZE;
@@ -119,7 +113,10 @@ export function useTerritoryPainting(factions: Faction[]) {
     if (!activeSnapshot || dirtyTiles.size === 0) return;
 
     // Group by faction
-    const tilesByFaction = new Map<string, Array<{ z: number; x: number; y: number; data: string }>>();
+    const tilesByFaction = new Map<
+      string,
+      Array<{ z: number; x: number; y: number; data: string }>
+    >();
 
     for (const key of dirtyTiles) {
       const parts = key.split("_");

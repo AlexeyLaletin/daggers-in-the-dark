@@ -83,7 +83,14 @@ export function SnapshotsPanel(): JSX.Element {
 
       {/* Map upload section */}
       {activeSnapshot && (
-        <div style={{ marginBottom: "1.5rem", padding: "1rem", backgroundColor: "#f5f5f5", borderRadius: "4px" }}>
+        <div
+          style={{
+            marginBottom: "1.5rem",
+            padding: "1rem",
+            backgroundColor: "#f5f5f5",
+            borderRadius: "4px",
+          }}
+        >
           <MapUploadPanel onMapUploaded={loadSnapshots} />
         </div>
       )}
@@ -193,9 +200,13 @@ export function SnapshotsPanel(): JSX.Element {
                   backgroundColor: activeSnapshot?.id === snapshot.id ? "#e3f2fd" : "#fff",
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                <div
+                  style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}
+                >
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: "bold", marginBottom: "0.25rem" }}>{snapshot.label}</div>
+                    <div style={{ fontWeight: "bold", marginBottom: "0.25rem" }}>
+                      {snapshot.label}
+                    </div>
                     <div style={{ fontSize: "0.85rem", color: "#666" }}>
                       {new Date(snapshot.at_date).toLocaleString()}
                     </div>

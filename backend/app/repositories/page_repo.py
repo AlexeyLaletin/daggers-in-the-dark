@@ -1,6 +1,5 @@
 """Page repository."""
 
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -20,9 +19,9 @@ class PageRepository:
 
     def get_by_title(self, title: str) -> NotePage | None:
         """Get page by title."""
-        return self.session.execute(
-            select(NotePage).where(NotePage.title == title)
-        ).scalars().first()
+        return (
+            self.session.execute(select(NotePage).where(NotePage.title == title)).scalars().first()
+        )
 
     def list_all(self) -> list[NotePage]:
         """List all pages."""

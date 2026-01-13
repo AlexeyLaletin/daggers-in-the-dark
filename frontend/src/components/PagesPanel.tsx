@@ -94,7 +94,14 @@ export function PagesPanel(): JSX.Element {
 
   return (
     <div style={{ padding: "1rem", display: "flex", flexDirection: "column", height: "100%" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1rem",
+        }}
+      >
         <h2 style={{ margin: 0 }}>Pages</h2>
         {!isCreating && (
           <button
@@ -131,7 +138,15 @@ export function PagesPanel(): JSX.Element {
 
       {/* Create/Edit form */}
       {isCreating && (
-        <form onSubmit={handleSubmit} style={{ marginBottom: "1.5rem", padding: "1rem", backgroundColor: "#f5f5f5", borderRadius: "4px" }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            marginBottom: "1.5rem",
+            padding: "1rem",
+            backgroundColor: "#f5f5f5",
+            borderRadius: "4px",
+          }}
+        >
           <h3 style={{ marginTop: 0, fontSize: "1rem" }}>{editingId ? "Edit" : "Create"} Page</h3>
 
           <input
@@ -170,7 +185,9 @@ export function PagesPanel(): JSX.Element {
           {viewMode === "gm" && (
             <select
               value={formData.visibility}
-              onChange={(e) => setFormData({ ...formData, visibility: e.target.value as "public" | "gm" })}
+              onChange={(e) =>
+                setFormData({ ...formData, visibility: e.target.value as "public" | "gm" })
+              }
               style={{
                 width: "100%",
                 padding: "0.5rem",
@@ -253,10 +270,26 @@ export function PagesPanel(): JSX.Element {
         </div>
 
         {/* Viewer */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "1rem", backgroundColor: "#fff", borderRadius: "4px", border: "1px solid #ccc" }}>
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: "1rem",
+            backgroundColor: "#fff",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        >
           {selectedPage ? (
             <>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "1rem" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "start",
+                  marginBottom: "1rem",
+                }}
+              >
                 <h3 style={{ margin: 0 }}>{selectedPage.title}</h3>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                   <button
@@ -293,7 +326,15 @@ export function PagesPanel(): JSX.Element {
                 {selectedPage.body_markdown}
               </div>
               {selectedPage.visibility === "gm" && (
-                <div style={{ marginTop: "1rem", padding: "0.5rem", backgroundColor: "#fff3e0", borderRadius: "4px", fontSize: "0.85rem" }}>
+                <div
+                  style={{
+                    marginTop: "1rem",
+                    padding: "0.5rem",
+                    backgroundColor: "#fff3e0",
+                    borderRadius: "4px",
+                    fontSize: "0.85rem",
+                  }}
+                >
                   🔒 This page is only visible to GM
                 </div>
               )}

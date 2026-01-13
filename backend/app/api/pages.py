@@ -28,9 +28,9 @@ async def list_pages(
     visibility = VisibilityService()
     allowed_scopes = visibility.get_allowed_scopes(view_mode)
 
-    pages = session.execute(
-        select(NotePage).where(NotePage.scope.in_(allowed_scopes))
-    ).scalars().all()
+    pages = (
+        session.execute(select(NotePage).where(NotePage.scope.in_(allowed_scopes))).scalars().all()
+    )
     return [NotePageResponse.from_orm(p) for p in pages]
 
 
@@ -42,7 +42,9 @@ async def create_page(
 ) -> NotePageResponse:
     """Create a new note page."""
     # Check for duplicate title
-    existing = session.execute(select(NotePage).where(NotePage.title == page_data.title)).scalars().first()
+    existing = (
+        session.execute(select(NotePage).where(NotePage.title == page_data.title)).scalars().first()
+    )
     if existing:
         raise HTTPException(status_code=409, detail="Page with this title already exists")
 
@@ -101,7 +103,11 @@ async def update_page(
 
     # Check for duplicate title if title is being changed
     if page_data.title and page_data.title != page.title:
-        existing = session.execute(select(NotePage).where(NotePage.title == page_data.title)).scalars().first()
+        existing = (
+            session.execute(select(NotePage).where(NotePage.title == page_data.title))
+            .scalars()
+            .first()
+        )
         if existing:
             raise HTTPException(status_code=409, detail="Page with this title already exists")
 

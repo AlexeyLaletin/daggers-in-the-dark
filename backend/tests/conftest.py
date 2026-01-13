@@ -150,7 +150,7 @@ def initialized_client(client: TestClient) -> TestClient:
             "timezone": "UTC",
             "initial_snapshot_date": "1847-01-01T00:00:00Z",
             "initial_snapshot_label": "Initial",
-        }
+        },
     )
     assert response.status_code == 201
     return client
@@ -314,7 +314,9 @@ def seed_small_town(db_session: Session) -> dict[str, any]:
         created_at=datetime(1920, 1, 1, 0, 0, 0),
         updated_at=datetime(1920, 1, 1, 0, 0, 0),
     )
-    db_session.add_all([crows_foot, leaky_bucket, old_bridge, bluecoat_precinct, warehouse_district])
+    db_session.add_all(
+        [crows_foot, leaky_bucket, old_bridge, bluecoat_precinct, warehouse_district]
+    )
 
     # === 5. People (NPCs) ===
     lyssa = Person(
@@ -558,7 +560,17 @@ def seed_small_town(db_session: Session) -> dict[str, any]:
         created_at=datetime(1920, 1, 3, 20, 0, 0),
         updated_at=datetime(1920, 1, 3, 20, 0, 0),
     )
-    db_session.add_all([page_crows, page_leaky_bucket, page_lyssa, page_lyssa_secret, page_player_notes, page_roric_death, page_warehouse_score])
+    db_session.add_all(
+        [
+            page_crows,
+            page_leaky_bucket,
+            page_lyssa,
+            page_lyssa_secret,
+            page_player_notes,
+            page_roric_death,
+            page_warehouse_score,
+        ]
+    )
 
     # === 9. Links (wikilinks) ===
     # Links will be created based on wikilink parsing in pages
@@ -579,7 +591,7 @@ def seed_small_town(db_session: Session) -> dict[str, any]:
     # === 10. Territory Tiles (minimal test data) ===
     # Create tiny 1x1 PNG placeholder for testing
     # PNG header + minimal IEND chunk (valid but tiny PNG)
-    tiny_png = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'
+    tiny_png = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82"
 
     tiles = [
         # Day1 tiles
@@ -587,14 +599,18 @@ def seed_small_town(db_session: Session) -> dict[str, any]:
             id=make_uuid("tile_day1_crows_0_0_0"),
             snapshot_id=day1.id,
             faction_id=crows.id,
-            z=0, x=0, y=0,
+            z=0,
+            x=0,
+            y=0,
             tile_data=tiny_png,
         ),
         TerritoryTile(
             id=make_uuid("tile_day1_bluecoats_0_1_0"),
             snapshot_id=day1.id,
             faction_id=bluecoats.id,
-            z=0, x=1, y=0,
+            z=0,
+            x=1,
+            y=0,
             tile_data=tiny_png,
         ),
         # Day2 tiles (expanded)
@@ -602,14 +618,18 @@ def seed_small_town(db_session: Session) -> dict[str, any]:
             id=make_uuid("tile_day2_crows_0_0_0"),
             snapshot_id=day2.id,
             faction_id=crows.id,
-            z=0, x=0, y=0,
+            z=0,
+            x=0,
+            y=0,
             tile_data=tiny_png,
         ),
         TerritoryTile(
             id=make_uuid("tile_day2_crows_0_0_1"),
             snapshot_id=day2.id,
             faction_id=crows.id,
-            z=0, x=0, y=1,
+            z=0,
+            x=0,
+            y=1,
             tile_data=tiny_png,
         ),
         # Day3 tiles
@@ -617,7 +637,9 @@ def seed_small_town(db_session: Session) -> dict[str, any]:
             id=make_uuid("tile_day3_lampblacks_0_2_0"),
             snapshot_id=day3.id,
             faction_id=lampblacks.id,
-            z=0, x=2, y=0,
+            z=0,
+            x=2,
+            y=0,
             tile_data=tiny_png,
         ),
     ]
@@ -674,26 +696,122 @@ def seed_small_town(db_session: Session) -> dict[str, any]:
     # === 12. Event Refs ===
     event_refs = [
         # Event 1 refs
-        EventRef(id=make_uuid("ref_event1_place"), event_id=event1.id, entity_type="place", entity_id=leaky_bucket.id, role="location"),
-        EventRef(id=make_uuid("ref_event1_faction_crows"), event_id=event1.id, entity_type="faction", entity_id=crows.id, role="involved"),
-        EventRef(id=make_uuid("ref_event1_faction_lamps"), event_id=event1.id, entity_type="faction", entity_id=lampblacks.id, role="involved"),
-        EventRef(id=make_uuid("ref_event1_person"), event_id=event1.id, entity_type="person", entity_id=lyssa.id, role="involved"),
+        EventRef(
+            id=make_uuid("ref_event1_place"),
+            event_id=event1.id,
+            entity_type="place",
+            entity_id=leaky_bucket.id,
+            role="location",
+        ),
+        EventRef(
+            id=make_uuid("ref_event1_faction_crows"),
+            event_id=event1.id,
+            entity_type="faction",
+            entity_id=crows.id,
+            role="involved",
+        ),
+        EventRef(
+            id=make_uuid("ref_event1_faction_lamps"),
+            event_id=event1.id,
+            entity_type="faction",
+            entity_id=lampblacks.id,
+            role="involved",
+        ),
+        EventRef(
+            id=make_uuid("ref_event1_person"),
+            event_id=event1.id,
+            entity_type="person",
+            entity_id=lyssa.id,
+            role="involved",
+        ),
         # Event 2 refs
-        EventRef(id=make_uuid("ref_event2_person"), event_id=event2.id, entity_type="person", entity_id=roric.id, role="target"),
-        EventRef(id=make_uuid("ref_event2_place"), event_id=event2.id, entity_type="place", entity_id=old_bridge.id, role="location"),
-        EventRef(id=make_uuid("ref_event2_faction"), event_id=event2.id, entity_type="faction", entity_id=lampblacks.id, role="involved"),
+        EventRef(
+            id=make_uuid("ref_event2_person"),
+            event_id=event2.id,
+            entity_type="person",
+            entity_id=roric.id,
+            role="target",
+        ),
+        EventRef(
+            id=make_uuid("ref_event2_place"),
+            event_id=event2.id,
+            entity_type="place",
+            entity_id=old_bridge.id,
+            role="location",
+        ),
+        EventRef(
+            id=make_uuid("ref_event2_faction"),
+            event_id=event2.id,
+            entity_type="faction",
+            entity_id=lampblacks.id,
+            role="involved",
+        ),
         # Event 3 refs
-        EventRef(id=make_uuid("ref_event3_person"), event_id=event3.id, entity_type="person", entity_id=captain_vale.id, role="involved"),
-        EventRef(id=make_uuid("ref_event3_place"), event_id=event3.id, entity_type="place", entity_id=warehouse_district.id, role="location"),
-        EventRef(id=make_uuid("ref_event3_faction"), event_id=event3.id, entity_type="faction", entity_id=lampblacks.id, role="target"),
+        EventRef(
+            id=make_uuid("ref_event3_person"),
+            event_id=event3.id,
+            entity_type="person",
+            entity_id=captain_vale.id,
+            role="involved",
+        ),
+        EventRef(
+            id=make_uuid("ref_event3_place"),
+            event_id=event3.id,
+            entity_type="place",
+            entity_id=warehouse_district.id,
+            role="location",
+        ),
+        EventRef(
+            id=make_uuid("ref_event3_faction"),
+            event_id=event3.id,
+            entity_type="faction",
+            entity_id=lampblacks.id,
+            role="target",
+        ),
         # Event 4 refs
-        EventRef(id=make_uuid("ref_event4_faction"), event_id=event4.id, entity_type="faction", entity_id=council.id, role="involved"),
-        EventRef(id=make_uuid("ref_event4_person"), event_id=event4.id, entity_type="person", entity_id=captain_vale.id, role="involved"),
+        EventRef(
+            id=make_uuid("ref_event4_faction"),
+            event_id=event4.id,
+            entity_type="faction",
+            entity_id=council.id,
+            role="involved",
+        ),
+        EventRef(
+            id=make_uuid("ref_event4_person"),
+            event_id=event4.id,
+            entity_type="person",
+            entity_id=captain_vale.id,
+            role="involved",
+        ),
         # Event 5 refs
-        EventRef(id=make_uuid("ref_event5_person1"), event_id=event5.id, entity_type="person", entity_id=cutter.id, role="involved"),
-        EventRef(id=make_uuid("ref_event5_person2"), event_id=event5.id, entity_type="person", entity_id=lurk.id, role="involved"),
-        EventRef(id=make_uuid("ref_event5_person3"), event_id=event5.id, entity_type="person", entity_id=slide.id, role="involved"),
-        EventRef(id=make_uuid("ref_event5_place"), event_id=event5.id, entity_type="place", entity_id=warehouse_district.id, role="location"),
+        EventRef(
+            id=make_uuid("ref_event5_person1"),
+            event_id=event5.id,
+            entity_type="person",
+            entity_id=cutter.id,
+            role="involved",
+        ),
+        EventRef(
+            id=make_uuid("ref_event5_person2"),
+            event_id=event5.id,
+            entity_type="person",
+            entity_id=lurk.id,
+            role="involved",
+        ),
+        EventRef(
+            id=make_uuid("ref_event5_person3"),
+            event_id=event5.id,
+            entity_type="person",
+            entity_id=slide.id,
+            role="involved",
+        ),
+        EventRef(
+            id=make_uuid("ref_event5_place"),
+            event_id=event5.id,
+            entity_type="place",
+            entity_id=warehouse_district.id,
+            role="location",
+        ),
     ]
     db_session.add_all(event_refs)
 

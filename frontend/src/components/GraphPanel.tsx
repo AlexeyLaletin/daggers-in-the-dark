@@ -7,7 +7,9 @@ export function GraphPanel(): JSX.Element {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [backlinks, setBacklinks] = useState<Array<{ id: string; title: string; visibility: string }>>([]);
+  const [backlinks, setBacklinks] = useState<
+    Array<{ id: string; title: string; visibility: string }>
+  >([]);
 
   const loadGraph = async () => {
     setLoading(true);
@@ -48,7 +50,9 @@ export function GraphPanel(): JSX.Element {
   if (loading) return <div style={{ padding: "1rem" }}>Loading graph...</div>;
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
-  const connectedEdges = edges.filter((e) => e.from_id === selectedNodeId || e.to_id === selectedNodeId);
+  const connectedEdges = edges.filter(
+    (e) => e.from_id === selectedNodeId || e.to_id === selectedNodeId
+  );
 
   return (
     <div style={{ padding: "1rem", display: "flex", flexDirection: "column", height: "100%" }}>
@@ -102,20 +106,32 @@ export function GraphPanel(): JSX.Element {
         </div>
 
         {/* Details */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "1rem", backgroundColor: "#fff", borderRadius: "4px", border: "1px solid #ccc" }}>
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: "1rem",
+            backgroundColor: "#fff",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        >
           {selectedNode ? (
             <>
               <h3 style={{ marginTop: 0 }}>{selectedNode.title}</h3>
 
               {/* Connected edges */}
               <div style={{ marginBottom: "1.5rem" }}>
-                <h4 style={{ fontSize: "0.95rem", marginBottom: "0.5rem" }}>Links ({connectedEdges.length})</h4>
+                <h4 style={{ fontSize: "0.95rem", marginBottom: "0.5rem" }}>
+                  Links ({connectedEdges.length})
+                </h4>
                 {connectedEdges.length === 0 ? (
                   <p style={{ color: "#666", fontSize: "0.85rem" }}>No links</p>
                 ) : (
                   <ul style={{ listStyle: "none", padding: 0 }}>
                     {connectedEdges.map((edge, idx) => {
-                      const otherNodeId = edge.from_id === selectedNodeId ? edge.to_id : edge.from_id;
+                      const otherNodeId =
+                        edge.from_id === selectedNodeId ? edge.to_id : edge.from_id;
                       const otherNode = nodes.find((n) => n.id === otherNodeId);
                       const direction = edge.from_id === selectedNodeId ? "→" : "←";
 
@@ -146,13 +162,18 @@ export function GraphPanel(): JSX.Element {
 
               {/* Backlinks */}
               <div>
-                <h4 style={{ fontSize: "0.95rem", marginBottom: "0.5rem" }}>Backlinks ({backlinks.length})</h4>
+                <h4 style={{ fontSize: "0.95rem", marginBottom: "0.5rem" }}>
+                  Backlinks ({backlinks.length})
+                </h4>
                 {backlinks.length === 0 ? (
                   <p style={{ color: "#666", fontSize: "0.85rem" }}>No pages link to this page</p>
                 ) : (
                   <ul style={{ listStyle: "none", padding: 0 }}>
                     {backlinks.map((backlink) => (
-                      <li key={backlink.id} style={{ marginBottom: "0.25rem", fontSize: "0.85rem" }}>
+                      <li
+                        key={backlink.id}
+                        style={{ marginBottom: "0.25rem", fontSize: "0.85rem" }}
+                      >
                         <button
                           onClick={() => setSelectedNodeId(backlink.id)}
                           style={{
@@ -174,13 +195,24 @@ export function GraphPanel(): JSX.Element {
               </div>
             </>
           ) : (
-            <p style={{ color: "#666", fontSize: "0.9rem" }}>Select a page to view its connections</p>
+            <p style={{ color: "#666", fontSize: "0.9rem" }}>
+              Select a page to view its connections
+            </p>
           )}
         </div>
       </div>
 
-      <div style={{ marginTop: "1rem", padding: "0.75rem", backgroundColor: "#e3f2fd", borderRadius: "4px", fontSize: "0.85rem" }}>
-        💡 <strong>Tip:</strong> Use [[Page Title]] in your page content to create wikilinks between pages.
+      <div
+        style={{
+          marginTop: "1rem",
+          padding: "0.75rem",
+          backgroundColor: "#e3f2fd",
+          borderRadius: "4px",
+          fontSize: "0.85rem",
+        }}
+      >
+        💡 <strong>Tip:</strong> Use [[Page Title]] in your page content to create wikilinks between
+        pages.
       </div>
     </div>
   );

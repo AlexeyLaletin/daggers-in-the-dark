@@ -7,7 +7,11 @@ interface ProjectInitModalProps {
   error: string | null;
 }
 
-export function ProjectInitModal({ onSubmit, isSubmitting, error }: ProjectInitModalProps): JSX.Element {
+export function ProjectInitModal({
+  onSubmit,
+  isSubmitting,
+  error,
+}: ProjectInitModalProps): JSX.Element {
   const [worldName, setWorldName] = useState("Doskvol");
   const [description, setDescription] = useState("");
   const [timezone, setTimezone] = useState("UTC");
@@ -72,7 +76,12 @@ export function ProjectInitModal({ onSubmit, isSubmitting, error }: ProjectInitM
           <div style={{ marginBottom: "1rem" }}>
             <label
               htmlFor="world-name"
-              style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem", fontWeight: "500" }}
+              style={{
+                display: "block",
+                marginBottom: "0.25rem",
+                fontSize: "0.9rem",
+                fontWeight: "500",
+              }}
             >
               World Name *
             </label>
@@ -97,7 +106,12 @@ export function ProjectInitModal({ onSubmit, isSubmitting, error }: ProjectInitM
           <div style={{ marginBottom: "1rem" }}>
             <label
               htmlFor="description"
-              style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem", fontWeight: "500" }}
+              style={{
+                display: "block",
+                marginBottom: "0.25rem",
+                fontSize: "0.9rem",
+                fontWeight: "500",
+              }}
             >
               Description
             </label>
@@ -122,7 +136,12 @@ export function ProjectInitModal({ onSubmit, isSubmitting, error }: ProjectInitM
           <div style={{ marginBottom: "1rem" }}>
             <label
               htmlFor="timezone"
-              style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem", fontWeight: "500" }}
+              style={{
+                display: "block",
+                marginBottom: "0.25rem",
+                fontSize: "0.9rem",
+                fontWeight: "500",
+              }}
             >
               Timezone
             </label>
@@ -148,7 +167,12 @@ export function ProjectInitModal({ onSubmit, isSubmitting, error }: ProjectInitM
           <div style={{ marginBottom: "1.5rem" }}>
             <label
               htmlFor="snapshot-label"
-              style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.9rem", fontWeight: "500" }}
+              style={{
+                display: "block",
+                marginBottom: "0.25rem",
+                fontSize: "0.9rem",
+                fontWeight: "500",
+              }}
             >
               Initial Snapshot Label
             </label>

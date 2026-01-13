@@ -146,7 +146,8 @@ export function MapUploadPanel({ onMapUploaded }: MapUploadPanelProps): JSX.Elem
       </div>
 
       <div style={{ marginTop: "0.75rem", fontSize: "0.8rem", color: "#666" }}>
-        💡 Tip: Upload PNG or JPEG images. The map will be displayed as the base layer on the canvas.
+        💡 Tip: Upload PNG or JPEG images. The map will be displayed as the base layer on the
+        canvas.
       </div>
     </div>
   );

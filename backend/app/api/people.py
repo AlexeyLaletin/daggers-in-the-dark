@@ -44,7 +44,7 @@ async def list_people(
                 "created_at": p.created_at,
                 "updated_at": p.updated_at,
             },
-            view_mode
+            view_mode,
         )
         for p in people
     ]
@@ -115,7 +115,7 @@ async def get_person(
             "created_at": person.created_at,
             "updated_at": person.updated_at,
         },
-        view_mode
+        view_mode,
     )
 
 

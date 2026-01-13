@@ -49,8 +49,7 @@ export function PlaceList(): JSX.Element {
                   padding: "0.5rem",
                   border: "1px solid #ccc",
                   borderRadius: "4px",
-                  backgroundColor:
-                    mapState.selectedPlaceId === place.id ? "#e3f2fd" : "#fff",
+                  backgroundColor: mapState.selectedPlaceId === place.id ? "#e3f2fd" : "#fff",
                   cursor: "pointer",
                 }}
               >

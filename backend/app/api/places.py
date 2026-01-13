@@ -43,7 +43,7 @@ async def list_places(
                 "created_at": p.created_at,
                 "updated_at": p.updated_at,
             },
-            view_mode
+            view_mode,
         )
         for p in places
         if visibility.filter_scope(p.scope, view_mode)
@@ -125,7 +125,7 @@ async def get_place(
             "created_at": place.created_at,
             "updated_at": place.updated_at,
         },
-        view_mode
+        view_mode,
     )
 
 

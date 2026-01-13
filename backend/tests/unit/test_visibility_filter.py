@@ -1,7 +1,6 @@
 """Unit tests for GM/Player visibility filter."""
 
 
-
 def test_gm_mode_shows_all_fields() -> None:
     """Test that GM mode includes notes_gm field."""
     # Will implement after filter function is created

@@ -1,6 +1,5 @@
 """Territory tile repository."""
 
-
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
@@ -23,17 +22,21 @@ class TileRepository:
         y: int,
     ) -> TerritoryTile | None:
         """Get a specific tile."""
-        return self.session.execute(
-            select(TerritoryTile).where(
-                and_(
-                    TerritoryTile.snapshot_id == snapshot_id,
-                    TerritoryTile.faction_id == faction_id,
-                    TerritoryTile.z == z,
-                    TerritoryTile.x == x,
-                    TerritoryTile.y == y,
+        return (
+            self.session.execute(
+                select(TerritoryTile).where(
+                    and_(
+                        TerritoryTile.snapshot_id == snapshot_id,
+                        TerritoryTile.faction_id == faction_id,
+                        TerritoryTile.z == z,
+                        TerritoryTile.x == x,
+                        TerritoryTile.y == y,
+                    )
                 )
             )
-        ).scalars().first()
+            .scalars()
+            .first()
+        )
 
     def list_tiles_for_faction_snapshot(
         self, snapshot_id: str, faction_id: str
@@ -47,7 +50,9 @@ class TileRepository:
                         TerritoryTile.faction_id == faction_id,
                     )
                 )
-            ).scalars().all()
+            )
+            .scalars()
+            .all()
         )
 
     def create(self, tile: TerritoryTile) -> TerritoryTile:
@@ -67,9 +72,7 @@ class TileRepository:
         self.session.delete(tile)
         self.session.flush()
 
-    def delete_all_for_faction_snapshot(
-        self, snapshot_id: str, faction_id: str
-    ) -> int:
+    def delete_all_for_faction_snapshot(self, snapshot_id: str, faction_id: str) -> int:
         """Delete all tiles for a faction in a snapshot. Returns count of deleted tiles."""
         tiles = self.list_tiles_for_faction_snapshot(snapshot_id, faction_id)
         count = len(tiles)

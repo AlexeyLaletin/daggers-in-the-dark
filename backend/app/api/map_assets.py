@@ -50,11 +50,7 @@ async def upload_map(
     height = 0
 
     # Check if map already exists for this snapshot
-    existing_map = (
-        session.query(MapAsset)
-        .filter(MapAsset.snapshot_id == snapshot_id)
-        .first()
-    )
+    existing_map = session.query(MapAsset).filter(MapAsset.snapshot_id == snapshot_id).first()
 
     if existing_map:
         # Update existing map
@@ -100,11 +96,7 @@ async def download_map(
         raise HTTPException(status_code=404, detail="Snapshot not found")
 
     # Get map asset
-    map_asset = (
-        session.query(MapAsset)
-        .filter(MapAsset.snapshot_id == snapshot_id)
-        .first()
-    )
+    map_asset = session.query(MapAsset).filter(MapAsset.snapshot_id == snapshot_id).first()
 
     if not map_asset:
         raise HTTPException(status_code=404, detail="Map not found for this snapshot")
@@ -127,11 +119,7 @@ async def delete_map(
         raise HTTPException(status_code=404, detail="Snapshot not found")
 
     # Get map asset
-    map_asset = (
-        session.query(MapAsset)
-        .filter(MapAsset.snapshot_id == snapshot_id)
-        .first()
-    )
+    map_asset = session.query(MapAsset).filter(MapAsset.snapshot_id == snapshot_id).first()
 
     if not map_asset:
         raise HTTPException(status_code=404, detail="Map not found for this snapshot")

@@ -1,4 +1,12 @@
-export type DrawerTab = "people" | "places" | "factions" | "pages" | "graph" | "snapshots" | "events" | "project";
+export type DrawerTab =
+  | "people"
+  | "places"
+  | "factions"
+  | "pages"
+  | "graph"
+  | "snapshots"
+  | "events"
+  | "project";
 
 interface DrawerProps {
   isOpen: boolean;

@@ -30,9 +30,13 @@ def rebuild_wikilinks_for_page(session: Session, page_id: str) -> None:
         return
 
     # Delete existing wikilinks from this page
-    existing_links = session.execute(
-        select(Link).where(Link.from_page_id == page_id, Link.link_type == "wikilink")
-    ).scalars().all()
+    existing_links = (
+        session.execute(
+            select(Link).where(Link.from_page_id == page_id, Link.link_type == "wikilink")
+        )
+        .scalars()
+        .all()
+    )
     for link in existing_links:
         session.delete(link)
 
@@ -45,7 +49,9 @@ def rebuild_wikilinks_for_page(session: Session, page_id: str) -> None:
     # Create Link entries for each referenced page
     for title in referenced_titles:
         # Find the target page by title
-        target_page = session.execute(select(NotePage).where(NotePage.title == title)).scalars().first()
+        target_page = (
+            session.execute(select(NotePage).where(NotePage.title == title)).scalars().first()
+        )
         if target_page:
             # Create link
             link = Link(
@@ -76,7 +82,11 @@ def get_backlinks(
         List of pages that link to the target page
     """
     # Get all links pointing to this page
-    query = select(NotePage).join(Link, Link.from_page_id == NotePage.id).where(Link.to_page_id == page_id)
+    query = (
+        select(NotePage)
+        .join(Link, Link.from_page_id == NotePage.id)
+        .where(Link.to_page_id == page_id)
+    )
 
     # Apply scope filter for player mode
     if view_mode == "player":

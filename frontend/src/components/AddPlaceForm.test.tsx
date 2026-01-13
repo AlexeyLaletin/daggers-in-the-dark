@@ -26,11 +26,7 @@ describe("AddPlaceForm component", () => {
 
   it("renders form with all fields", () => {
     renderWithProvider(
-      <AddPlaceForm
-        position={mockPosition}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <AddPlaceForm position={mockPosition} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     expect(screen.getByLabelText(/Name/i)).toBeInTheDocument();
@@ -40,11 +36,7 @@ describe("AddPlaceForm component", () => {
 
   it("displays position coordinates", () => {
     renderWithProvider(
-      <AddPlaceForm
-        position={mockPosition}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <AddPlaceForm position={mockPosition} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     expect(screen.getByText(/Position: \(100, 200\)/i)).toBeInTheDocument();
@@ -52,11 +44,7 @@ describe("AddPlaceForm component", () => {
 
   it("shows GM-only fields in GM mode", () => {
     renderWithProvider(
-      <AddPlaceForm
-        position={mockPosition}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <AddPlaceForm position={mockPosition} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     expect(screen.getByLabelText(/GM Notes/i)).toBeInTheDocument();
@@ -67,11 +55,7 @@ describe("AddPlaceForm component", () => {
   it("validates required name field", async () => {
     const user = userEvent.setup();
     renderWithProvider(
-      <AddPlaceForm
-        position={mockPosition}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <AddPlaceForm position={mockPosition} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     await user.click(screen.getByText("Create Place"));
@@ -95,11 +79,7 @@ describe("AddPlaceForm component", () => {
     });
 
     renderWithProvider(
-      <AddPlaceForm
-        position={mockPosition}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <AddPlaceForm position={mockPosition} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     await user.type(screen.getByLabelText(/Name/i), "Test Place");
@@ -119,11 +99,7 @@ describe("AddPlaceForm component", () => {
   it("calls onCancel when cancel button is clicked", async () => {
     const user = userEvent.setup();
     renderWithProvider(
-      <AddPlaceForm
-        position={mockPosition}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <AddPlaceForm position={mockPosition} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     await user.click(screen.getByText("Cancel"));
@@ -135,11 +111,7 @@ describe("AddPlaceForm component", () => {
     vi.mocked(apiClient.createPlace).mockRejectedValue(new Error("API Error"));
 
     renderWithProvider(
-      <AddPlaceForm
-        position={mockPosition}
-        onSuccess={mockOnSuccess}
-        onCancel={mockOnCancel}
-      />
+      <AddPlaceForm position={mockPosition} onSuccess={mockOnSuccess} onCancel={mockOnCancel} />
     );
 
     await user.type(screen.getByLabelText(/Name/i), "Test Place");

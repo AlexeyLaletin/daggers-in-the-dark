@@ -18,9 +18,7 @@ export function LayerControl(): JSX.Element {
         boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
       }}
     >
-      <h3 style={{ margin: "0 0 0.75rem 0", fontSize: "0.9rem", fontWeight: "bold" }}>
-        Layers
-      </h3>
+      <h3 style={{ margin: "0 0 0.75rem 0", fontSize: "0.9rem", fontWeight: "bold" }}>Layers</h3>
       {mapState.layers.map((layer) => (
         <div key={layer.id} style={{ marginBottom: "0.75rem" }}>
           <div style={{ display: "flex", alignItems: "center", marginBottom: "0.25rem" }}>
@@ -31,10 +29,7 @@ export function LayerControl(): JSX.Element {
               onChange={(e) => updateLayer(layer.id, { visible: e.target.checked })}
               style={{ marginRight: "0.5rem" }}
             />
-            <label
-              htmlFor={`layer-${layer.id}`}
-              style={{ fontSize: "0.85rem", fontWeight: "500" }}
-            >
+            <label htmlFor={`layer-${layer.id}`} style={{ fontSize: "0.85rem", fontWeight: "500" }}>
               {layer.name}
             </label>
           </div>

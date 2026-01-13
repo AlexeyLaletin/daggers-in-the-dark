@@ -369,7 +369,9 @@ class APIClient {
     return response.json();
   }
 
-  async getBacklinks(pageId: string): Promise<Array<{ id: string; title: string; visibility: string }>> {
+  async getBacklinks(
+    pageId: string
+  ): Promise<Array<{ id: string; title: string; visibility: string }>> {
     const response = await fetch(`${this.baseURL}/graph/backlinks/${pageId}`, {
       headers: this.getHeaders(),
     });
@@ -413,7 +415,13 @@ class APIClient {
   }
 
   // Tile endpoints
-  async getTile(snapshotId: string, factionId: string, z: number, x: number, y: number): Promise<Blob | null> {
+  async getTile(
+    snapshotId: string,
+    factionId: string,
+    z: number,
+    x: number,
+    y: number
+  ): Promise<Blob | null> {
     const response = await fetch(
       `${this.baseURL}/snapshots/${snapshotId}/territory/tiles?faction_id=${factionId}&z=${z}&x=${x}&y=${y}`,
       { headers: this.getHeaders() }
